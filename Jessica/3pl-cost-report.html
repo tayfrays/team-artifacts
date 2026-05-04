@@ -3,583 +3,582 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Outway — Profit Calculator</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>3PL Cost Report — Outway</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --ow-orange: #FF522C;
-    --ow-black: #000000;
-    --ow-green: #BDC5BB;
-    --ow-blue: #C0CDDD;
-    --ow-gray: #F1F1F1;
-    --ow-mid-gray: #E5E5E5;
-    --ow-white: #FFFFFF;
-    --ow-positive: #2a7d5a;
-    --ow-negative: #FF522C;
+    --orange:   #FF522C;
+    --black:    #000000;
+    --green:    #BDC5BB;
+    --blue:     #C0CDDD;
+    --lgray:    #F1F1F1;
+    --white:    #FFFFFF;
+    --border:   #E2E2E2;
+    --border2:  #CACACA;
+    --text:     #000000;
+    --text2:    #444444;
+    --text3:    #888888;
+    --surface:  #F8F8F8;
+    --surface2: #F1F1F1;
+    --warn:     #E07B00;
+    --danger:   #CC1F1F;
+    --ca:       #FF522C;
+    --ca-dim:   rgba(255,82,44,0.08);
+    --us:       #2B4EA8;
+    --us-dim:   rgba(43,78,168,0.08);
+    --fm: 'JetBrains Mono', monospace;
+    --fp: 'Plus Jakarta Sans', sans-serif;
   }
 
-  body {
-    background: #fff;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    color: var(--ow-black);
-    min-height: 100vh;
-  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--white); color: var(--text); font-family: var(--fm); font-size: 13px; min-height: 100vh; }
 
-  /* ── BODY ── */
-  .body {
-    padding: 2rem 2.5rem;
-    max-width: 1100px;
-    margin: 0 auto;
+  /* ── Tool Description ──────────────────────────────────── */
+  .tool-desc {
+    padding: 1.5rem 2.5rem 0;
+    max-width: 1480px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
   }
-
-  /* ── SECTION TAG ── */
-  .section-tag {
-    font-family: 'JetBrains Mono', monospace;
+  .tool-desc-tag {
+    font-family: var(--fm);
     font-size: 9px;
-    letter-spacing: .15em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--ow-orange);
-    margin: 2rem 0 .75rem;
-    padding-bottom: .4rem;
-    border-bottom: 1px solid var(--ow-orange);
+    color: var(--orange);
     display: flex;
     align-items: center;
     gap: 8px;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--orange);
+    margin-bottom: 0.75rem;
   }
-  .section-tag::after {
+  .tool-desc-tag::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: #eee;
+    background: var(--border);
   }
-
-  /* ── GRIDS ── */
-  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
-  .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
-
-  /* ── INPUTS ── */
-  .input-row { display: flex; flex-direction: column; gap: 5px; }
-  .input-row label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: #888;
-  }
-  .input-row input {
-    padding: 9px 12px;
-    font-size: 15px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 500;
-    border: 1px solid #ddd;
-    border-bottom: 2px solid #ccc;
-    background: #fafafa;
-    color: var(--ow-black);
-    border-radius: 2px;
-    width: 100%;
-    transition: border-color .15s;
-  }
-  .input-row input:focus {
-    outline: none;
-    border-color: var(--ow-orange);
-    border-bottom-color: var(--ow-orange);
-    background: #fff;
-  }
-  .input-hint {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    color: #bbb;
-  }
-
-  /* ── SLIDER ── */
-  .slider-row { display: flex; flex-direction: column; gap: 5px; }
-  .slider-row .slabel {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: #888;
+  .tool-desc-body {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+    flex-wrap: wrap;
   }
-  .slider-row .slabel span { color: var(--ow-orange); font-weight: 500; }
-  .slider-row input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 3px;
-    background: var(--ow-mid-gray);
-    border-radius: 0;
-    outline: none;
-    margin: 4px 0;
-  }
-  .slider-row input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: var(--ow-orange);
-    border-radius: 50%;
-    cursor: pointer;
-  }
-  .shint {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    color: #bbb;
-  }
-
-  /* ── METRIC CARDS ── */
-  .metric-card {
-    background: var(--ow-gray);
-    padding: 1.1rem 1.1rem 1rem;
-    border-radius: 2px;
-    border-top: 2px solid transparent;
-  }
-  .metric-card.dark {
-    background: var(--ow-black);
-    border-top: 2px solid #222;
-  }
-  .metric-card.outlined {
-    background: #fff;
-    border: 1.5px solid var(--ow-black);
-    border-top: 3px solid var(--ow-orange);
-  }
-
-  .mc-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: #999;
-    margin-bottom: .4rem;
-  }
-  .metric-card.dark .mc-tag { color: #444; }
-  .metric-card.outlined .mc-tag { color: var(--ow-orange); }
-
-  .mc-val {
-    font-size: 23px;
-    font-weight: 600;
-    color: var(--ow-black);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    line-height: 1;
-  }
-  .metric-card.dark .mc-val { color: var(--ow-white); }
-  .metric-card.outlined .mc-val { font-size: 28px; }
-
-  .mc-sub {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    color: #bbb;
-    margin-top: .35rem;
-    line-height: 1.5;
-  }
-  .metric-card.dark .mc-sub { color: #444; }
-  .metric-card.outlined .mc-sub { color: #aaa; }
-
-  .mc-cost {
-    font-size: 16px;
-    font-weight: 600;
-    color: #FF522C;
-    margin-top: .3rem;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-  }
-  .metric-card.dark .mc-cost { color: #ff6b4a; }
-
-  .positive { color: var(--ow-positive) !important; }
-  .negative { color: var(--ow-negative) !important; }
-
-  /* ── WATERFALL ── */
-  .waterfall {
-    border: 1px solid #e8e8e8;
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .wf-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 9px 16px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  .wf-row:last-child { border-bottom: none; }
-  .wf-sub { background: #fcfcfc; }
-  .wf-highlight { background: #fff7f5; }
-  .wf-total {
-    background: var(--ow-black);
-    padding: 12px 16px;
-  }
-  .wf-key {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .04em;
-    color: #777;
-    text-transform: uppercase;
-  }
-  .wf-highlight .wf-key { color: var(--ow-orange); }
-  .wf-total .wf-key { color: #555; }
-  .wf-val {
+  .tool-desc-name {
+    font-family: var(--fp);
     font-size: 13px;
     font-weight: 600;
-    color: var(--ow-black);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--text);
+    white-space: nowrap;
   }
-  .wf-val.muted { color: #bbb; font-weight: 400; }
-  .wf-total .wf-val { color: var(--ow-white); font-size: 15px; }
-
-  /* ── SCENARIO ── */
-  .scenario-wrap {
-    background: var(--ow-black);
-    border-radius: 2px;
-    padding: 1.5rem;
-    border-top: 3px solid var(--ow-orange);
-  }
-  .scenario-wrap .section-tag {
-    color: var(--ow-orange);
-    border-bottom-color: var(--ow-orange);
-    margin-top: 0;
-  }
-  .scenario-wrap .section-tag::after { background: #1a1a1a; }
-  .scenario-wrap .slabel { color: #555; }
-  .scenario-wrap .shint { color: #333; }
-  .scenario-wrap input[type=range] { background: #1a1a1a; }
-
-  .scen-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0,1fr));
-    gap: 14px;
-    margin-top: .75rem;
-  }
-  .scen-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: #444;
-    margin-bottom: .3rem;
-  }
-  .scen-val {
-    font-size: 20px;
-    font-weight: 600;
-    color: #fff;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-  }
-  .scen-divider {
-    border: none;
-    border-top: 1px solid #1a1a1a;
-    margin: 14px 0;
+  .tool-desc-text {
+    font-family: var(--fp);
+    font-size: 13px;
+    color: var(--text3);
+    line-height: 1.5;
   }
 
-  /* ── FOOTER ── */
-  .footer {
-    padding: 1.5rem 2.5rem;
-    border-top: 1px solid #eee;
+  /* ── Tabs / Nav ────────────────────────────────────────── */
+  .tabs {
     display: flex;
-    justify-content: space-between;
+    padding: 0 36px;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 0;
+  }
+  .tab {
+    font-family: var(--fm);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    cursor: pointer;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--text3);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab:hover { color: var(--text2); }
+  .tab.ca-on { color: var(--ca); border-bottom-color: var(--ca); }
+  .tab.us-on { color: var(--us); border-bottom-color: var(--us); }
+
+  /* ── Main Layout ───────────────────────────────────────── */
+  .main { padding: 28px 36px 60px; max-width: 1480px; }
+
+  /* ── Upload bar ────────────────────────────────────────── */
+  .upload-bar {
+    display: flex;
     align-items: center;
-    margin-top: 1rem;
+    gap: 14px;
+    border: 1.5px dashed var(--border2);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    background: var(--surface);
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
   }
-  .footer-left {
-    font-family: 'JetBrains Mono', monospace;
+  .upload-bar:hover { border-color: var(--text3); background: var(--lgray); }
+  .upload-ico { font-size: 18px; flex-shrink: 0; }
+  .upload-copy { flex: 1; }
+  .upload-copy b { font-family: var(--fp); font-size: 12px; color: var(--text); font-weight: 600; display: block; margin-bottom: 2px; }
+  .upload-copy small { font-size: 10px; color: var(--text3); }
+  .upload-btn {
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    border: 1.5px solid;
+    transition: all 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ca-btn { border-color: var(--ca); color: var(--ca); background: transparent; }
+  .ca-btn:hover { background: var(--ca); color: var(--white); }
+  .us-btn { border-color: var(--us); color: var(--us); background: transparent; }
+  .us-btn:hover { background: var(--us); color: var(--white); }
+  input[type=file] { display: none; }
+
+  /* ── Section Labels ────────────────────────────────────── */
+  .slabel {
+    font-family: var(--fm);
     font-size: 9px;
-    letter-spacing: .1em;
-    color: #ccc;
+    font-weight: 700;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
+    color: var(--text3);
+    margin: 24px 0 10px;
+    border-left: 2px solid var(--orange);
+    padding-left: 8px;
   }
-  .footer-logo {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: .2em;
-    color: var(--ow-orange);
+  .slabel:first-child { margin-top: 0; }
+
+  /* ── KPI Cards ─────────────────────────────────────────── */
+  .kpi-row { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; margin-bottom: 8px; }
+  .kpi {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 16px 13px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-accent { position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .kpi-lbl { font-family: var(--fm); font-size: 8.5px; color: var(--text3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+  .kpi-val { font-family: var(--fp); font-size: 22px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+  .kpi-sub { font-family: var(--fm); font-size: 9px; color: var(--text3); margin-top: 6px; }
+  .kpi-delta { font-family: var(--fm); font-size: 10px; margin-top: 4px; }
+
+  .c-ca { color: var(--ca); }
+  .c-us { color: var(--us); }
+  .c-warn { color: var(--warn); }
+  .c-danger { color: var(--danger); }
+  .c-muted { color: var(--text2); }
+
+  /* ── Charts ────────────────────────────────────────────── */
+  .chart-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .chart-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 18px 20px;
+  }
+  .chart-ttl {
+    font-family: var(--fm);
+    font-size: 8.5px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+  /* ── Flags ─────────────────────────────────────────────── */
+  .flag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  .flag {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+  .flag-ttl {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .flag-body {
+    font-family: var(--fp);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.65;
+  }
+  .flag-body b { font-weight: 600; color: var(--text); }
+
+  /* ── Data Table ────────────────────────────────────────── */
+  table.dt { width: 100%; border-collapse: collapse; }
+  table.dt th {
+    font-family: var(--fm);
+    font-size: 8px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0 6px 9px;
+    text-align: left;
+    font-weight: 400;
+    border-bottom: 1px solid var(--border);
+  }
+  table.dt th:not(:first-child) { text-align: right; }
+  table.dt td {
+    font-family: var(--fm);
+    font-size: 11px;
+    padding: 6px 6px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  table.dt td:not(:first-child) { text-align: right; color: var(--text2); }
+  table.dt tr:hover td { background: var(--surface); }
+  .bar-wrap { display: inline-block; width: 40px; height: 3px; background: var(--border); border-radius: 2px; vertical-align: middle; margin-left: 6px; }
+  .bar-fill { height: 3px; border-radius: 2px; }
+
+  /* ── Period Selector ───────────────────────────────────── */
+  .period-row { display: flex; align-items: center; gap: 7px; margin-bottom: 20px; flex-wrap: wrap; }
+  .period-btn {
+    font-family: var(--fm);
+    font-size: 10px;
+    padding: 5px 11px;
+    border-radius: 2px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text3);
+    transition: all 0.12s;
+    letter-spacing: 0.04em;
+  }
+  .period-btn:hover { border-color: var(--text2); color: var(--text); }
+  .period-btn.sel-ca { border-color: var(--ca); color: var(--ca); background: var(--ca-dim); }
+  .period-btn.sel-us { border-color: var(--us); color: var(--us); background: var(--us-dim); }
+  .period-lbl { font-family: var(--fm); font-size: 9px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  hr.div { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+
+  /* ── Toast ─────────────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--black);
+    border-left: 3px solid var(--orange);
+    border-radius: 2px;
+    padding: 12px 18px;
+    font-family: var(--fm);
+    font-size: 11px;
+    color: var(--white);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    pointer-events: none;
+    z-index: 200;
+    max-width: 300px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .chart-grid { grid-template-columns: 1fr 1fr; }
+    .chart-grid > *:first-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 960px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .chart-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .flag-grid { grid-template-columns: 1fr 1fr; }
+    .main { padding: 20px 18px 48px; }
+    .tabs { padding-left: 18px; padding-right: 18px; }
+    .tool-desc { padding-left: 18px; padding-right: 18px; }
+    .tab { padding: 12px 14px; font-size: 9px; }
+  }
+  @media (max-width: 600px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .flag-grid { grid-template-columns: 1fr; }
+    .tabs { overflow-x: auto; padding-left: 14px; }
+    .tab { white-space: nowrap; }
+    .main { padding: 16px 14px 48px; }
+    .tool-desc { padding-left: 14px; padding-right: 14px; }
+    .period-row { gap: 5px; }
+    .upload-bar { flex-wrap: wrap; }
+    .tool-desc-body { flex-direction: column; gap: 4px; }
   }
 </style>
 </head>
 <body>
 
-<div class="body">
-
-  <div class="section-tag">Volume Inputs</div>
-  <div class="grid3">
-    <div class="input-row">
-      <label>Orders</label>
-      <input type="number" id="orders" value="4520" min="0" step="1">
-      <span class="input-hint">Total order count</span>
-    </div>
-    <div class="input-row">
-      <label>AOV — incl. shipping</label>
-      <input type="number" id="aov" value="83" min="0" step="0.01">
-      <span class="input-hint">Avg order value including shipping charged</span>
-    </div>
-    <div class="input-row">
-      <label>Avg shipping revenue / order</label>
-      <input type="number" id="shipRevPerOrder" value="2.80" min="0" step="0.01">
-      <span class="input-hint">Portion of AOV that is shipping — breakout only, not added</span>
-    </div>
+<!-- ── Tool Description ────────────────────────────────────────────────── -->
+<div class="tool-desc">
+  <div class="tool-desc-tag">3PL Cost Report</div>
+  <div class="tool-desc-body">
+    <span class="tool-desc-name">Operations / Logistics</span>
+    <span class="tool-desc-text">Semi-monthly cost dashboard across Canada (YYZ5) and US (LAX1) — orders, shipping, pick & pack, delayed postage true-ups, storage, and carrier mix. Upload new GoBolt CSVs to extend the timeline.</span>
   </div>
-
-  <div class="section-tag">Cost Inputs</div>
-  <div class="grid3">
-    <div class="input-row">
-      <label>Avg shipping cost / order</label>
-      <input type="number" id="shipCostPerOrder" value="19.44" min="0" step="0.01">
-      <span class="input-hint">Actual cost to ship</span>
-    </div>
-    <div class="slider-row">
-      <div class="slabel">COGS % of net revenue <span id="cogsLabel">34.0%</span></div>
-      <input type="range" id="cogsPct" min="0" max="80" step="0.1" value="34">
-      <span class="shint">Blended cost of goods sold</span>
-    </div>
-    <div class="input-row">
-      <label>Ad spend ($)</label>
-      <input type="number" id="adSpend" value="181499" min="0" step="100">
-      <span class="input-hint">Total paid media</span>
-    </div>
-  </div>
-  <div class="grid3" style="margin-top:14px">
-    <div class="input-row">
-      <label>Fixed expenses ($)</label>
-      <input type="number" id="fixedExp" value="40000" min="0" step="100">
-      <span class="input-hint">Ops, salaries, overhead</span>
-    </div>
-    <div class="slider-row">
-      <div class="slabel">Transaction fees % of total revenue <span id="txFeeLabel">4.39%</span></div>
-      <input type="range" id="txFeePct" min="0" max="10" step="0.01" value="4.39">
-      <span class="shint">Payment processing & platform fees</span>
-    </div>
-    <div></div>
-  </div>
-
-  <div class="section-tag">Revenue</div>
-  <div class="grid3">
-    <div class="metric-card">
-      <div class="mc-tag">Net Product Revenue</div>
-      <div class="mc-val" id="m-netRev">—</div>
-      <div class="mc-sub">Orders × (AOV − shipping rev)</div>
-    </div>
-    <div class="metric-card">
-      <div class="mc-tag">Shipping Revenue</div>
-      <div class="mc-val" id="m-shipRev">—</div>
-      <div class="mc-sub" id="m-shipRevPct">—% of total revenue</div>
-      <div class="mc-sub" id="m-shipRevPerOrder">— avg/order</div>
-    </div>
-    <div class="metric-card outlined">
-      <div class="mc-tag">Total Revenue</div>
-      <div class="mc-val" id="m-totalRev">—</div>
-      <div class="mc-sub">Orders × AOV</div>
-    </div>
-  </div>
-
-  <div class="section-tag">Costs</div>
-  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px">
-    <div class="metric-card dark">
-      <div class="mc-tag">Shipping Cost</div>
-      <div class="mc-val" id="m-shipCostPct">—</div>
-      <div class="mc-cost" id="m-shipCostAmt">—</div>
-      <div class="mc-sub">of total revenue</div>
-    </div>
-    <div class="metric-card dark">
-      <div class="mc-tag">COGS</div>
-      <div class="mc-val" id="m-cogsPctDisp">—</div>
-      <div class="mc-cost" id="m-cogsAmt">—</div>
-      <div class="mc-sub">of net revenue</div>
-    </div>
-    <div class="metric-card dark">
-      <div class="mc-tag">Transaction Fees</div>
-      <div class="mc-val" id="m-txFeePct">—</div>
-      <div class="mc-cost" id="m-txFeeAmt">—</div>
-      <div class="mc-sub">of total revenue</div>
-    </div>
-    <div class="metric-card dark">
-      <div class="mc-tag">Ad Spend</div>
-      <div class="mc-val" id="m-adSpendPct">—</div>
-      <div class="mc-cost" id="m-adSpendAmt">—</div>
-      <div class="mc-sub">of total revenue</div>
-    </div>
-    <div class="metric-card dark">
-      <div class="mc-tag">Fixed Expenses</div>
-      <div class="mc-val" id="m-fixedExpPct">—</div>
-      <div class="mc-cost" id="m-fixedExpAmt">—</div>
-      <div class="mc-sub">of total revenue</div>
-    </div>
-  </div>
-
-  <div class="section-tag">Profitability</div>
-  <div class="grid3">
-    <div class="metric-card">
-      <div class="mc-tag">Contribution Margin %</div>
-      <div class="mc-val" id="m-contPct">—</div>
-      <div class="mc-sub">After COGS, shipping &amp; ads</div>
-    </div>
-    <div class="metric-card">
-      <div class="mc-tag">Contribution Profit</div>
-      <div class="mc-val" id="m-contProfit">—</div>
-      <div class="mc-sub">Gross profit − variable costs</div>
-    </div>
-    <div class="metric-card">
-      <div class="mc-tag">Net Profit Margin %</div>
-      <div class="mc-val" id="m-netPct">—</div>
-      <div class="mc-sub" id="m-netProfit">—</div>
-    </div>
-  </div>
-
-  <div class="section-tag">Full Waterfall</div>
-  <div class="waterfall">
-    <div class="wf-row wf-highlight"><span class="wf-key">Total revenue (orders × AOV)</span><span class="wf-val" id="f-totalRev">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">&nbsp;&nbsp;&nbsp;of which: shipping revenue</span><span class="wf-val muted" id="f-shipRev">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">&nbsp;&nbsp;&nbsp;of which: product revenue</span><span class="wf-val muted" id="f-netRev">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">− COGS (<span id="f-cogsPctLabel">—</span>% of product rev)</span><span class="wf-val muted" id="f-cogs">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">− Shipping cost</span><span class="wf-val muted" id="f-shipCost">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">− Transaction fees (<span id="f-txFeePctLabel">—</span>% of total rev)</span><span class="wf-val muted" id="f-txFee">—</span></div>
-    <div class="wf-row wf-highlight"><span class="wf-key">= Gross profit</span><span class="wf-val" id="f-grossProfit">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">&nbsp;&nbsp;&nbsp;Gross margin %</span><span class="wf-val muted" id="f-grossMargin">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">− Ad spend</span><span class="wf-val muted" id="f-adSpend">—</span></div>
-    <div class="wf-row wf-highlight"><span class="wf-key">= Contribution profit</span><span class="wf-val" id="f-contProfit">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">&nbsp;&nbsp;&nbsp;Contribution margin %</span><span class="wf-val muted" id="f-contPct2">—</span></div>
-    <div class="wf-row wf-sub"><span class="wf-key">− Fixed expenses</span><span class="wf-val muted" id="f-fixedExp">—</span></div>
-    <div class="wf-row wf-total"><span class="wf-key">Net operating profit</span><span class="wf-val" id="f-netProfit">—</span></div>
-  </div>
-
-  <div class="section-tag" style="margin-top:2rem">Scenario Dial</div>
-  <div class="scenario-wrap">
-    <div class="slider-row">
-      <div class="slabel" style="color:#555">Order volume multiplier <span id="multLabel" style="color:var(--ow-orange)">1.00×</span></div>
-      <input type="range" id="multiplier" min="0.5" max="3" step="0.05" value="1">
-      <span class="shint" style="color:#333">Scale orders up or down — all per-order rates and percentages hold constant</span>
-    </div>
-    <div class="scen-grid">
-      <div><div class="scen-label">Scenario orders</div><div class="scen-val" id="s-orders">—</div></div>
-      <div><div class="scen-label">Scenario total revenue</div><div class="scen-val" id="s-netRev">—</div></div>
-      <div><div class="scen-label">Scenario cont. profit</div><div class="scen-val" id="s-contProfit">—</div></div>
-    </div>
-    <hr class="scen-divider">
-    <div class="scen-grid">
-      <div><div class="scen-label">Scenario MER</div><div class="scen-val" id="s-mer">—</div></div>
-      <div><div class="scen-label">Scenario net profit</div><div class="scen-val" id="s-netProfit">—</div></div>
-      <div><div class="scen-label">Scenario net margin %</div><div class="scen-val" id="s-netPct">—</div></div>
-    </div>
-  </div>
-
 </div>
 
+<!-- ── Tab Nav ─────────────────────────────────────────────────────────── -->
+<div class="tabs">
+  <button class="tab ca-on" onclick="setTab('CA')" id="tabCA">🇨🇦 &nbsp;Canada — YYZ5</button>
+  <button class="tab" onclick="setTab('US')" id="tabUS">🇺🇸 &nbsp;United States — LAX1</button>
+  <span style="margin-left:auto;font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:0.08em;align-self:center;padding-right:4px" id="hdrDate"></span>
+</div>
+
+<div class="main" id="root"></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="fileInput" accept=".csv">
+
 <script>
-  const fmt = v => '$' + Math.round(v).toLocaleString();
-  const fmtNeg = v => '−$' + Math.round(Math.abs(v)).toLocaleString();
-  const fmtPct = v => v.toFixed(1) + '%';
+// ── Historical data ───────────────────────────────────────────────────────
+const CA_DATA = [
+  {"label":"Jan 1-15","endDate":"2026-01-15","nOrders":2755,"invoiceTotal":41987.01,"costPerOrder":15.24,"avgShipping":11.88,"totalShipping":30462.1,"totalPick":7114.94,"totalDelayed":302.74,"totalStorage":2924.85,"totalReceiving":627.99,"goboltPct":45.2,"parcllPct":51.2,"provinces":[{"province":"QC","orders":1024,"cost":11571.08,"avg":11.28,"pct":39.9},{"province":"BC","orders":590,"cost":8065.7,"avg":13.62,"pct":23.0},{"province":"ON","orders":490,"cost":4627.02,"avg":9.4,"pct":19.1},{"province":"AB","orders":305,"cost":4035.86,"avg":13.19,"pct":11.9},{"province":"NB","orders":45,"cost":565.87,"avg":12.57,"pct":1.8},{"province":"SK","orders":38,"cost":477.46,"avg":12.56,"pct":1.5},{"province":"MB","orders":25,"cost":324.26,"avg":12.97,"pct":1.0},{"province":"NS","orders":24,"cost":309.67,"avg":12.9,"pct":0.9}]},
+  {"label":"Jan 16-31","endDate":"2026-01-31","nOrders":1598,"invoiceTotal":70703.17,"costPerOrder":44.24,"avgShipping":12.14,"totalShipping":17718.36,"totalPick":4735.06,"totalDelayed":35260.14,"totalStorage":3359.71,"totalReceiving":1501.76,"goboltPct":43.6,"parcllPct":53.0,"provinces":[{"province":"QC","orders":674,"cost":7805.32,"avg":11.58,"pct":46.2},{"province":"ON","orders":290,"cost":2804.37,"avg":9.67,"pct":19.9},{"province":"BC","orders":269,"cost":3776.29,"avg":14.04,"pct":18.4},{"province":"AB","orders":115,"cost":1640.78,"avg":14.27,"pct":7.9},{"province":"NB","orders":27,"cost":352.87,"avg":13.07,"pct":1.8},{"province":"SK","orders":24,"cost":374.14,"avg":15.59,"pct":1.6},{"province":"NS","orders":23,"cost":278.39,"avg":12.1,"pct":1.6},{"province":"MB","orders":21,"cost":332.16,"avg":15.82,"pct":1.4}]},
+  {"label":"Feb 1-15","endDate":"2026-02-15","nOrders":1265,"invoiceTotal":24649.31,"costPerOrder":19.49,"avgShipping":12.97,"totalShipping":15080.45,"totalPick":3998.94,"totalDelayed":112.06,"totalStorage":4583.2,"totalReceiving":136.26,"goboltPct":42.6,"parcllPct":47.2,"provinces":[{"province":"QC","orders":505,"cost":6427.84,"avg":12.73,"pct":43.4},{"province":"BC","orders":269,"cost":3855.48,"avg":14.33,"pct":23.1},{"province":"ON","orders":216,"cost":2129.45,"avg":9.86,"pct":18.6},{"province":"AB","orders":108,"cost":1500.47,"avg":13.89,"pct":9.3},{"province":"NB","orders":18,"cost":354.61,"avg":19.7,"pct":1.5},{"province":"SK","orders":16,"cost":249.66,"avg":15.6,"pct":1.4},{"province":"MB","orders":14,"cost":239.96,"avg":17.14,"pct":1.2},{"province":"NS","orders":10,"cost":145.44,"avg":14.54,"pct":0.9}]},
+  {"label":"Feb 16-28","endDate":"2026-02-28","nOrders":1968,"invoiceTotal":45502.68,"costPerOrder":23.12,"avgShipping":12.88,"totalShipping":23411.54,"totalPick":7716.66,"totalDelayed":9935.22,"totalStorage":3890.42,"totalReceiving":157.6,"goboltPct":37.0,"parcllPct":59.3,"provinces":[{"province":"QC","orders":835,"cost":9897.01,"avg":11.84,"pct":45.9},{"province":"BC","orders":359,"cost":5537.76,"avg":14.97,"pct":19.7},{"province":"ON","orders":321,"cost":3109.34,"avg":9.69,"pct":17.7},{"province":"AB","orders":174,"cost":2427.58,"avg":13.87,"pct":9.6},{"province":"NB","orders":33,"cost":453.73,"avg":13.75,"pct":1.8},{"province":"SK","orders":29,"cost":416.37,"avg":14.36,"pct":1.6},{"province":"NS","orders":27,"cost":378.56,"avg":14.02,"pct":1.5},{"province":"MB","orders":20,"cost":223.67,"avg":11.18,"pct":1.1}]},
+  {"label":"Mar 1-15","endDate":"2026-03-15","nOrders":1361,"invoiceTotal":27185.6,"costPerOrder":19.97,"avgShipping":12.52,"totalShipping":15379.93,"totalPick":4923.46,"totalDelayed":-122.39,"totalStorage":4792.18,"totalReceiving":1624.87,"goboltPct":29.5,"parcllPct":67.0,"provinces":[{"province":"QC","orders":550,"cost":6651.99,"avg":12.07,"pct":44.8},{"province":"BC","orders":253,"cost":3659.38,"avg":14.46,"pct":20.6},{"province":"ON","orders":213,"cost":2105.79,"avg":9.89,"pct":17.3},{"province":"AB","orders":122,"cost":1610.2,"avg":13.2,"pct":9.9},{"province":"MB","orders":26,"cost":274.13,"avg":10.54,"pct":2.1},{"province":"SK","orders":23,"cost":320.35,"avg":13.93,"pct":1.9},{"province":"NB","orders":21,"cost":279.86,"avg":13.33,"pct":1.7},{"province":"NS","orders":12,"cost":179.62,"avg":14.97,"pct":1.0}]},
+  {"label":"Mar 16-31","endDate":"2026-03-31","nOrders":7456,"invoiceTotal":125467.78,"costPerOrder":16.83,"avgShipping":12.33,"totalShipping":83813.15,"totalPick":28436.28,"totalDelayed":6840.23,"totalStorage":5269.66,"totalReceiving":826.37,"goboltPct":27.9,"parcllPct":70.4,"provinces":[{"province":"QC","orders":3487,"cost":41289.22,"avg":11.83,"pct":51.3},{"province":"BC","orders":1209,"cost":17367.0,"avg":14.36,"pct":17.8},{"province":"ON","orders":998,"cost":10133.74,"avg":10.15,"pct":14.7},{"province":"AB","orders":625,"cost":8002.78,"avg":12.8,"pct":9.2},{"province":"NB","orders":122,"cost":1771.49,"avg":14.52,"pct":1.8},{"province":"MB","orders":101,"cost":1275.01,"avg":12.5,"pct":1.5},{"province":"NS","orders":97,"cost":1321.79,"avg":13.63,"pct":1.4},{"province":"SK","orders":95,"cost":1236.12,"avg":13.01,"pct":1.4}]},
+  {"label":"Apr 1-15","endDate":"2026-04-15","nOrders":3172,"invoiceTotal":70893.34,"costPerOrder":22.35,"avgShipping":12.44,"totalShipping":36622.79,"totalPick":9992.54,"totalDelayed":18360.14,"totalStorage":4465.49,"totalReceiving":11.48,"goboltPct":38.7,"parcllPct":60.0,"provinces":[{"province":"QC","orders":1382,"cost":16180.52,"avg":11.7,"pct":46.9},{"province":"BC","orders":543,"cost":7917.15,"avg":14.45,"pct":18.4},{"province":"ON","orders":489,"cost":4904.86,"avg":10.03,"pct":16.6},{"province":"AB","orders":343,"cost":4944.05,"avg":14.41,"pct":11.7},{"province":"SK","orders":48,"cost":673.14,"avg":14.02,"pct":1.6},{"province":"MB","orders":44,"cost":489.19,"avg":11.12,"pct":1.5},{"province":"NB","orders":37,"cost":522.12,"avg":14.11,"pct":1.3},{"province":"NS","orders":32,"cost":436.11,"avg":13.63,"pct":1.1}]}
+];
 
-  function applyColor(el, v, base) {
-    el.className = base + (v >= 0 ? ' positive' : ' negative');
-  }
+const US_DATA = [
+  {"label":"Jan 1-15","endDate":"2026-01-15","nOrders":1142,"invoiceTotal":12503.37,"costPerOrder":10.95,"avgShipping":7.06,"totalShipping":8060.0,"totalPick":2467.68,"totalDelayed":214.83,"totalStorage":1083.66,"totalReceiving":66.46,"goboltPct":0.0,"parcllPct":77.5,"provinces":[{"province":"CA","orders":183,"cost":1154.0,"avg":6.31,"pct":16.0},{"province":"FL","orders":82,"cost":653.37,"avg":7.97,"pct":7.2},{"province":"TX","orders":79,"cost":545.89,"avg":6.91,"pct":6.9},{"province":"NY","orders":61,"cost":468.33,"avg":7.68,"pct":5.3},{"province":"CO","orders":47,"cost":315.83,"avg":6.72,"pct":4.1},{"province":"OH","orders":45,"cost":348.34,"avg":7.74,"pct":3.9},{"province":"WA","orders":45,"cost":290.65,"avg":6.46,"pct":3.9},{"province":"OR","orders":38,"cost":240.5,"avg":6.33,"pct":3.3}]},
+  {"label":"Jan 16-31","endDate":"2026-01-31","nOrders":770,"invoiceTotal":8716.64,"costPerOrder":11.32,"avgShipping":6.68,"totalShipping":5146.43,"totalPick":1838.89,"totalDelayed":5.3,"totalStorage":1142.04,"totalReceiving":285.09,"goboltPct":0.0,"parcllPct":84.8,"provinces":[{"province":"CA","orders":142,"cost":857.76,"avg":6.04,"pct":18.4},{"province":"TX","orders":61,"cost":405.17,"avg":6.64,"pct":7.9},{"province":"FL","orders":43,"cost":310.63,"avg":7.22,"pct":5.6},{"province":"WA","orders":41,"cost":258.97,"avg":6.32,"pct":5.3},{"province":"CO","orders":38,"cost":231.74,"avg":6.1,"pct":4.9},{"province":"NC","orders":31,"cost":219.31,"avg":7.07,"pct":4.0},{"province":"UT","orders":27,"cost":171.41,"avg":6.35,"pct":3.5},{"province":"NY","orders":25,"cost":177.9,"avg":7.12,"pct":3.2}]},
+  {"label":"Feb 1-15","endDate":"2026-02-15","nOrders":629,"invoiceTotal":7710.03,"costPerOrder":12.26,"avgShipping":7.22,"totalShipping":4543.59,"totalPick":1522.5,"totalDelayed":230.77,"totalStorage":1210.98,"totalReceiving":81.32,"goboltPct":0.0,"parcllPct":78.1,"provinces":[{"province":"CA","orders":113,"cost":701.0,"avg":6.2,"pct":18.0},{"province":"TX","orders":51,"cost":368.6,"avg":7.23,"pct":8.1},{"province":"FL","orders":38,"cost":288.62,"avg":7.6,"pct":6.0},{"province":"CO","orders":33,"cost":229.51,"avg":6.95,"pct":5.2},{"province":"AZ","orders":29,"cost":195.69,"avg":6.75,"pct":4.6},{"province":"NY","orders":24,"cost":181.52,"avg":7.56,"pct":3.8},{"province":"PA","orders":22,"cost":162.75,"avg":7.4,"pct":3.5},{"province":"NC","orders":21,"cost":162.87,"avg":7.76,"pct":3.3}]},
+  {"label":"Feb 16-28","endDate":"2026-02-28","nOrders":631,"invoiceTotal":7467.43,"costPerOrder":11.83,"avgShipping":7.43,"totalShipping":4687.27,"totalPick":1477.97,"totalDelayed":-12.84,"totalStorage":1048.62,"totalReceiving":149.56,"goboltPct":0.0,"parcllPct":99.7,"provinces":[{"province":"CA","orders":85,"cost":568.03,"avg":6.6,"pct":13.5},{"province":"TX","orders":58,"cost":417.32,"avg":7.2,"pct":9.2},{"province":"FL","orders":39,"cost":304.12,"avg":7.8,"pct":6.2},{"province":"WA","orders":33,"cost":242.24,"avg":7.34,"pct":5.2},{"province":"CO","orders":32,"cost":231.11,"avg":7.22,"pct":5.1},{"province":"NY","orders":30,"cost":233.07,"avg":7.77,"pct":4.8},{"province":"OR","orders":25,"cost":185.45,"avg":7.42,"pct":4.0},{"province":"IL","orders":21,"cost":152.78,"avg":7.28,"pct":3.3}]},
+  {"label":"Mar 1-15","endDate":"2026-03-15","nOrders":571,"invoiceTotal":7475.24,"costPerOrder":13.09,"avgShipping":7.68,"totalShipping":4383.91,"totalPick":1427.38,"totalDelayed":40.65,"totalStorage":1173.44,"totalReceiving":338.94,"goboltPct":0.0,"parcllPct":92.8,"provinces":[{"province":"CA","orders":72,"cost":489.43,"avg":6.53,"pct":12.6},{"province":"TX","orders":39,"cost":292.18,"avg":7.49,"pct":6.8},{"province":"CO","orders":35,"cost":266.39,"avg":7.4,"pct":6.1},{"province":"FL","orders":28,"cost":214.38,"avg":7.39,"pct":4.9},{"province":"NY","orders":25,"cost":214.25,"avg":8.24,"pct":4.4},{"province":"WA","orders":25,"cost":190.46,"avg":7.33,"pct":4.4},{"province":"OR","orders":21,"cost":177.86,"avg":8.08,"pct":3.7},{"province":"MA","orders":19,"cost":142.74,"avg":7.51,"pct":3.3}]},
+  {"label":"Mar 16-31","endDate":"2026-03-31","nOrders":1973,"invoiceTotal":21665.81,"costPerOrder":10.98,"avgShipping":7.69,"totalShipping":15173.07,"totalPick":5092.82,"totalDelayed":24.67,"totalStorage":1224.19,"totalReceiving":18.46,"goboltPct":0.0,"parcllPct":62.4,"provinces":[{"province":"CA","orders":249,"cost":1710.28,"avg":6.87,"pct":12.6},{"province":"TX","orders":155,"cost":1170.8,"avg":7.55,"pct":7.9},{"province":"WA","orders":121,"cost":827.54,"avg":6.84,"pct":6.1},{"province":"FL","orders":115,"cost":951.76,"avg":8.28,"pct":5.8},{"province":"CO","orders":113,"cost":812.51,"avg":7.19,"pct":5.7},{"province":"NY","orders":93,"cost":740.35,"avg":7.96,"pct":4.7},{"province":"NC","orders":64,"cost":521.52,"avg":8.15,"pct":3.2},{"province":"OR","orders":64,"cost":458.2,"avg":7.16,"pct":3.2}]},
+  {"label":"Apr 1-15","endDate":"2026-04-15","nOrders":1017,"invoiceTotal":12891.55,"costPerOrder":12.68,"avgShipping":8.74,"totalShipping":8892.3,"totalPick":2505.09,"totalDelayed":118.06,"totalStorage":1197.3,"totalReceiving":78.32,"goboltPct":0.0,"parcllPct":34.6,"provinces":[{"province":"CA","orders":148,"cost":1123.83,"avg":7.59,"pct":14.6},{"province":"TX","orders":91,"cost":801.82,"avg":8.81,"pct":8.9},{"province":"CO","orders":64,"cost":551.22,"avg":8.61,"pct":6.3},{"province":"FL","orders":52,"cost":483.79,"avg":9.3,"pct":5.1},{"province":"NY","orders":45,"cost":415.57,"avg":9.23,"pct":4.4},{"province":"WA","orders":45,"cost":378.9,"avg":8.42,"pct":4.4},{"province":"OR","orders":42,"cost":358.68,"avg":8.54,"pct":4.1},{"province":"IL","orders":34,"cost":297.79,"avg":8.76,"pct":3.3}]}
+];
 
-  function calc() {
-    const orders       = parseFloat(document.getElementById('orders').value) || 0;
-    const aov          = parseFloat(document.getElementById('aov').value) || 0;
-    const shipRevPO    = parseFloat(document.getElementById('shipRevPerOrder').value) || 0;
-    const shipCostPO   = parseFloat(document.getElementById('shipCostPerOrder').value) || 0;
-    const cogsPct      = parseFloat(document.getElementById('cogsPct').value) || 0;
-    const fixedExp     = parseFloat(document.getElementById('fixedExp').value) || 0;
-    const adSpend      = parseFloat(document.getElementById('adSpend').value) || 0;
-    const txFeePct     = parseFloat(document.getElementById('txFeePct').value) || 0;
-    const mult         = parseFloat(document.getElementById('multiplier').value) || 1;
+// ── State ─────────────────────────────────────────────────────────────────
+let tab = 'CA', selPeriod = null, charts = {}, pendingRegion = null;
+const data  = () => tab === 'CA' ? CA_DATA : US_DATA;
+const accent= () => tab === 'CA' ? '#FF522C' : '#2B4EA8';
+const acCls = () => tab === 'CA' ? 'c-ca' : 'c-us';
+const cur   = () => tab === 'CA' ? 'CAD' : 'USD';
+const isCA  = () => tab === 'CA';
 
-    const netRev         = orders * aov;                          // total rev = orders × full AOV
-    const totalRev       = netRev;                                 // alias for clarity
-    const shipRev        = orders * shipRevPO;                     // carved out of AOV — breakout only
-    const productRev     = totalRev - shipRev;                     // product-only revenue
-    const shipCost       = orders * shipCostPO;
-    const cogs           = productRev * (cogsPct / 100);           // COGS on product rev only
-    const txFee          = totalRev * (txFeePct / 100);
-    const grossProfit    = totalRev - cogs - shipCost - txFee;
-    const grossMarginPct = totalRev > 0 ? (grossProfit / totalRev) * 100 : 0;
-    const contProfit     = grossProfit - adSpend;
-    const contPct        = totalRev > 0 ? (contProfit / totalRev) * 100 : 0;
-    const netProfit      = contProfit - fixedExp;
-    const netPct         = totalRev > 0 ? (netProfit / totalRev) * 100 : 0;
-    const adPct          = totalRev > 0 ? (adSpend / totalRev) * 100 : 0;
-    const shipRevPct     = totalRev > 0 ? (shipRev / totalRev) * 100 : 0;
-    const shipCostPct    = totalRev > 0 ? (shipCost / totalRev) * 100 : 0;
-    const fixedExpPct    = totalRev > 0 ? (fixedExp / totalRev) * 100 : 0;
-    const shipRevAsPct   = aov > 0 ? (shipRevPO / aov) * 100 : 0;
+function setTab(t) {
+  tab=t; selPeriod=null;
+  document.getElementById('tabCA').className='tab'+(t==='CA'?' ca-on':'');
+  document.getElementById('tabUS').className='tab'+(t==='US'?' us-on':'');
+  render();
+}
+function selectPeriod(lbl) { selPeriod=lbl; render(); }
+function triggerUpload(r) { pendingRegion=r; document.getElementById('fileInput').click(); }
 
-    document.getElementById('cogsLabel').textContent  = cogsPct.toFixed(1) + '%';
-    document.getElementById('txFeeLabel').textContent = txFeePct.toFixed(2) + '%';
+// ── Upload ────────────────────────────────────────────────────────────────
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const period = processCSV(ev.target.result, pendingRegion);
+      const arr = pendingRegion==='CA' ? CA_DATA : US_DATA;
+      const idx = arr.findIndex(p=>p.label===period.label);
+      if(idx>=0) arr[idx]=period; else arr.push(period);
+      selPeriod = period.label;
+      render();
+      toast('✓ Loaded '+period.label+' ('+period.nOrders.toLocaleString()+' orders)');
+    } catch(err) { toast('⚠ Parse error: '+err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+});
 
-    document.getElementById('m-netRev').textContent    = fmt(productRev);
-    document.getElementById('m-shipRev').textContent   = fmt(shipRev);
-    document.getElementById('m-shipRevPct').textContent = fmtPct(shipRevPct) + ' of total revenue';
-    document.getElementById('m-shipRevPerOrder').textContent = '$' + shipRevPO.toFixed(2) + ' avg/order (' + fmtPct(shipRevAsPct) + ' of AOV)';
-    document.getElementById('m-totalRev').textContent  = fmt(totalRev);
-
-    document.getElementById('m-shipCostPct').textContent = fmtPct(shipCostPct);
-    document.getElementById('m-shipCostAmt').textContent = fmtNeg(shipCost);
-    document.getElementById('m-cogsPctDisp').textContent = fmtPct(cogsPct);
-    document.getElementById('m-cogsAmt').textContent     = fmtNeg(cogs);
-    document.getElementById('m-txFeePct').textContent    = fmtPct(txFeePct);
-    document.getElementById('m-txFeeAmt').textContent    = fmtNeg(txFee);
-    document.getElementById('m-adSpendPct').textContent  = fmtPct(adPct);
-    document.getElementById('m-adSpendAmt').textContent  = fmtNeg(adSpend);
-    document.getElementById('m-fixedExpPct').textContent = fmtPct(fixedExpPct);
-    document.getElementById('m-fixedExpAmt').textContent = fmtNeg(fixedExp);
-
-    applyColor(document.getElementById('m-contPct'),    contPct,    'mc-val');
-    applyColor(document.getElementById('m-contProfit'), contProfit, 'mc-val');
-    document.getElementById('m-contPct').textContent    = fmtPct(contPct);
-    document.getElementById('m-contProfit').textContent = fmt(contProfit);
-
-    applyColor(document.getElementById('m-netPct'), netPct, 'mc-val');
-    document.getElementById('m-netPct').textContent   = fmtPct(netPct);
-    document.getElementById('m-netProfit').textContent = fmt(netProfit) + ' net profit';
-
-    document.getElementById('f-netRev').textContent      = fmt(productRev);
-    document.getElementById('f-shipRev').textContent     = fmt(shipRev);
-    document.getElementById('f-totalRev').textContent    = fmt(totalRev);
-    document.getElementById('f-cogsPctLabel').textContent = cogsPct.toFixed(1);
-    document.getElementById('f-cogs').textContent        = fmt(cogs);
-    document.getElementById('f-shipCost').textContent    = fmt(shipCost);
-    document.getElementById('f-txFeePctLabel').textContent = txFeePct.toFixed(2);
-    document.getElementById('f-txFee').textContent       = fmt(txFee);
-    document.getElementById('f-grossProfit').textContent = fmt(grossProfit);
-    document.getElementById('f-grossMargin').textContent = fmtPct(grossMarginPct);
-    document.getElementById('f-adSpend').textContent     = fmt(adSpend);
-    document.getElementById('f-contPct2').textContent    = fmtPct(contPct);
-    document.getElementById('f-fixedExp').textContent    = fmt(fixedExp);
-
-    applyColor(document.getElementById('f-contProfit'), contProfit, 'wf-val');
-    document.getElementById('f-contProfit').textContent = fmt(contProfit);
-    applyColor(document.getElementById('f-netProfit'), netProfit, 'wf-val');
-    document.getElementById('f-netProfit').textContent = fmt(netProfit);
-
-    document.getElementById('multLabel').textContent = mult.toFixed(2) + '×';
-
-    const sOrders    = Math.round(orders * mult);
-    const sTotalRev  = sOrders * aov;
-    const sShipRev   = sOrders * shipRevPO;
-    const sProductRev = sTotalRev - sShipRev;
-    const sShipCost  = sOrders * shipCostPO;
-    const sCogs      = sProductRev * (cogsPct / 100);
-    const sTxFee     = sTotalRev * (txFeePct / 100);
-    const sGross     = sTotalRev - sCogs - sShipCost - sTxFee;
-    const sCont      = sGross - adSpend;
-    const sNet       = sCont - fixedExp;
-    const sNetPct  = sTotalRev > 0 ? (sNet / sTotalRev) * 100 : 0;
-    const sMer     = adSpend > 0 ? sTotalRev / adSpend : 0;
-
-    document.getElementById('s-orders').textContent = sOrders.toLocaleString();
-    document.getElementById('s-netRev').textContent = fmt(sTotalRev);
-    document.getElementById('s-mer').textContent    = sMer.toFixed(2) + '×';
-
-    applyColor(document.getElementById('s-contProfit'), sCont,    'scen-val');
-    applyColor(document.getElementById('s-netProfit'),  sNet,     'scen-val');
-    applyColor(document.getElementById('s-netPct'),     sNetPct,  'scen-val');
-    document.getElementById('s-contProfit').textContent = fmt(sCont);
-    document.getElementById('s-netProfit').textContent  = fmt(sNet);
-    document.getElementById('s-netPct').textContent     = fmtPct(sNetPct);
-  }
-
-  ['orders','aov','shipRevPerOrder','shipCostPerOrder','fixedExp','adSpend','cogsPct','txFeePct','multiplier'].forEach(id => {
-    document.getElementById(id).addEventListener('input', calc);
+function processCSV(text, region) {
+  const lines = text.trim().split('\n');
+  const hdr = lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  const rows = lines.slice(1).map(line=>{ const v=line.split(',').map(x=>x.replace(/"/g,'').trim()); const o={}; hdr.forEach((h,i)=>o[h]=v[i]||''); return o; });
+  const n=v=>parseFloat(v)||0;
+  const isOrd=r=>r.external_order_name&&r.external_order_name.startsWith('#');
+  const ordRows=rows.filter(isOrd);
+  const shipped=new Set(ordRows.filter(r=>r.service==='Delivery'||r.service==='Processing').map(r=>r.external_order_name));
+  const delRows=ordRows.filter(r=>r.service==='Delivery');
+  let tShip=0,tPick=0,tDelay=0,tStore=0,tRecv=0;
+  const pMap={}, cMap={};
+  delRows.forEach(r=>{
+    const sc=n(r.postage_cost)+n(r.total_parcel_delivery_amount)+n(r.total_fuel_surcharge_amount);
+    tShip+=sc;
+    const pv=r.shipping_address_province||r.shipping_address_state||'?';
+    if(!pMap[pv]) pMap[pv]={orders:0,cost:0}; pMap[pv].orders++; pMap[pv].cost+=sc;
+    const ca=r.service_provider||'Unknown';
+    if(!cMap[ca]) cMap[ca]={orders:0}; cMap[ca].orders++;
   });
-  calc();
+  rows.forEach(r=>{
+    if(r.service==='Storage') tStore+=n(r.total_amount_all_services);
+    if(r.service==='Receiving') tRecv+=n(r.total_amount_all_services);
+    if(isOrd(r)) tDelay+=n(r.delayed_postage_cost);
+    if(isOrd(r)&&(r.service==='Processing'||r.service==='Delivery')) tPick+=n(r.subtotal_pick_amount);
+  });
+  const td=delRows.length||1;
+  const provinces=Object.entries(pMap).map(([p,v])=>({province:p,orders:v.orders,cost:Math.round(v.cost*100)/100,avg:Math.round(v.cost/v.orders*100)/100,pct:Math.round(v.orders/td*1000)/10})).sort((a,b)=>b.orders-a.orders).slice(0,8);
+  const totC=Object.values(cMap).reduce((s,v)=>s+v.orders,0)||1;
+  const gbP=Math.round((cMap['GoBolt']?.orders||0)/totC*1000)/10;
+  const paP=Math.round(Object.entries(cMap).filter(([k])=>k.includes('Parcll')).reduce((s,[,v])=>s+v.orders,0)/totC*1000)/10;
+  const dates=delRows.map(r=>r.service_date).filter(Boolean).sort();
+  const first=dates[0]||'', last=dates[dates.length-1]||'';
+  const fd=d=>d?d.slice(5).replace(/-/g,'/'):'?';
+  const label=first?fd(first)+' – '+fd(last):'Uploaded';
+  const nO=shipped.size;
+  return { label, endDate:last||new Date().toISOString().slice(0,10), nOrders:nO, invoiceTotal:0, costPerOrder:0, avgShipping:nO>0?Math.round(tShip/nO*100)/100:0, totalShipping:Math.round(tShip*100)/100, totalPick:Math.round(tPick*100)/100, totalDelayed:Math.round(tDelay*100)/100, totalStorage:Math.round(tStore*100)/100, totalReceiving:Math.round(tRecv*100)/100, goboltPct:gbP, parcllPct:paP, provinces, uploaded:true };
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function fmt(n,d=2){ if(n==null||isNaN(n)) return '—'; return (n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function fmtK(n){ if(Math.abs(n)>=1000) return (n<0?'-':'')+'$'+Math.abs(n/1000).toFixed(1)+'k'; return fmt(n); }
+function delta(c,p){ if(!p||p===0) return ''; const d=((c-p)/Math.abs(p)*100); const cl=d>5?'c-danger':d<-5?'c-ca':'c-muted'; return `<span class="${cl}">${d>0?'▲':'▼'} ${Math.abs(d).toFixed(1)}%</span>`; }
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000); }
+function destroyCharts(){ Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}}); charts={}; }
+
+// ── Chart defaults ────────────────────────────────────────────────────────
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.color = '#888888';
+
+// ── Render ────────────────────────────────────────────────────────────────
+function render() {
+  destroyCharts();
+  const d=data(); if(!d.length){ document.getElementById('root').innerHTML='<div style="text-align:center;padding:60px;color:var(--text3);font-family:var(--fp)">Upload a CSV to get started</div>'; return; }
+  const pidx=selPeriod?d.findIndex(p=>p.label===selPeriod):d.length-1;
+  const p=d[Math.max(0,pidx)], prev=pidx>0?d[pidx-1]:null;
+  const ac=acCls(), ac2=accent();
+  const acDim = isCA() ? 'rgba(255,82,44,0.1)' : 'rgba(43,78,168,0.1)';
+
+  document.getElementById('hdrDate').textContent=p.endDate?'Through '+p.endDate:'';
+
+  const ytdOrders=d.reduce((s,x)=>s+x.nOrders,0);
+  const ytdInvoice=d.reduce((s,x)=>s+x.invoiceTotal,0);
+  const ytdDelayed=d.reduce((s,x)=>s+x.totalDelayed,0);
+  const trendLabels=d.map(x=>x.label);
+  const trendCPO=d.map(x=>x.costPerOrder||0);
+  const trendShip=d.map(x=>x.avgShipping||0);
+  const trendOrders=d.map(x=>x.nOrders||0);
+  const rWord=isCA()?'Province':'State';
+
+  const delayedFlag=p.totalDelayed>5000
+    ?`<div class="flag" style="border-left:3px solid var(--danger)"><div class="flag-ttl c-danger">⚠ Delayed Postage Spike</div><div class="flag-body"><b>${fmtK(p.totalDelayed)}</b> in delayed true-ups — catch-up charges from prior Parcll shipments landing this period. Monitor next period for normalisation.</div></div>`
+    :p.totalDelayed<-100
+    ?`<div class="flag" style="border-left:3px solid var(--ca)"><div class="flag-ttl c-ca">↩ Delayed Postage Credit</div><div class="flag-body"><b>${fmtK(Math.abs(p.totalDelayed))}</b> credit applied — billing correction received from carrier.</div></div>`
+    :`<div class="flag"><div class="flag-ttl" style="color:var(--text3)">Delayed Postage</div><div class="flag-body">Normal — <b>${fmtK(p.totalDelayed)}</b> in true-ups. No unusual activity.</div></div>`;
+
+  const storageFlag=prev&&p.totalStorage>prev.totalStorage*1.15
+    ?`<div class="flag" style="border-left:3px solid var(--warn)"><div class="flag-ttl c-warn">⚠ Storage Rising</div><div class="flag-body">Up <b>${(((p.totalStorage-prev.totalStorage)/prev.totalStorage)*100).toFixed(0)}%</b> vs prior (${fmtK(prev.totalStorage)} → <b>${fmtK(p.totalStorage)}</b>). Review inbound inventory levels.</div></div>`
+    :`<div class="flag"><div class="flag-ttl" style="color:var(--text3)">Storage</div><div class="flag-body"><b>${fmtK(p.totalStorage)}</b> this period${prev?' vs '+fmtK(prev.totalStorage)+' prior':''} — normal range.</div></div>`;
+
+  const parcllFlag=p.parcllPct>70
+    ?`<div class="flag" style="border-left:3px solid var(--warn)"><div class="flag-ttl c-warn">⚠ High Parcll Mix — ${p.parcllPct}%</div><div class="flag-body">Parcll true all-in cost (incl. delayed) runs ~47% above base rate. ${isCA()?'Push more QC volume to GoBolt.':'Monitor delayed postage accrual closely.'}</div></div>`
+    :`<div class="flag" style="border-left:3px solid ${ac2}"><div class="flag-ttl" style="color:${ac2}">Carrier Mix</div><div class="flag-body">Parcll at <b>${p.parcllPct}%</b>${isCA()?', GoBolt at <b>'+p.goboltPct+'%</b>':''} — within target.</div></div>`;
+
+  document.getElementById('root').innerHTML = `
+<div class="slabel">Reporting Period</div>
+<div class="period-row">
+  <span class="period-lbl">Select →</span>
+  ${d.map(x=>`<button class="period-btn ${x.label===p.label?(isCA()?'sel-ca':'sel-us'):''}" onclick="selectPeriod('${x.label}')">${x.label}${x.uploaded?' ✦':''}</button>`).join('')}
+</div>
+
+<div class="upload-bar" onclick="triggerUpload('${tab}')">
+  <span class="upload-ico">📂</span>
+  <div class="upload-copy">
+    <b>Upload new ${tab} period CSV</b>
+    <small>Add a new GoBolt semi_monthly.csv — it will appear as a new period in the timeline</small>
+  </div>
+  <button class="upload-btn ${isCA()?'ca-btn':'us-btn'}" onclick="event.stopPropagation();triggerUpload('${tab}')">Choose file</button>
+</div>
+
+<div class="slabel">Period Snapshot — ${p.label} &nbsp;<span style="color:var(--text3);font-weight:400;font-size:8px;letter-spacing:0.08em">${cur()} pre-tax</span></div>
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-accent" style="background:${ac2}"></div><div class="kpi-lbl">Fulfilled Orders</div><div class="kpi-val ${ac}">${p.nOrders.toLocaleString()}</div><div class="kpi-sub">${prev?'vs '+prev.nOrders.toLocaleString()+' prior':''}</div><div class="kpi-delta">${prev?delta(p.nOrders,prev.nOrders):''}</div></div>
+  <div class="kpi"><div class="kpi-accent" style="background:${ac2}"></div><div class="kpi-lbl">Invoice Total</div><div class="kpi-val ${ac}">${p.invoiceTotal?fmtK(p.invoiceTotal):'—'}</div><div class="kpi-sub">${cur()} pre-tax</div><div class="kpi-delta">${prev&&p.invoiceTotal&&prev.invoiceTotal?delta(p.invoiceTotal,prev.invoiceTotal):''}</div></div>
+  <div class="kpi"><div class="kpi-accent" style="background:${p.costPerOrder>20?'var(--danger)':p.costPerOrder>15?'var(--warn)':ac2}"></div><div class="kpi-lbl">All-In Cost / Order</div><div class="kpi-val ${p.costPerOrder>20?'c-danger':p.costPerOrder>15?'c-warn':ac}">${p.costPerOrder?fmt(p.costPerOrder):'—'}</div><div class="kpi-sub">invoice ÷ orders</div><div class="kpi-delta">${prev&&p.costPerOrder&&prev.costPerOrder?delta(p.costPerOrder,prev.costPerOrder):''}</div></div>
+  <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-lbl">Avg Shipping / Order</div><div class="kpi-val c-warn">${fmt(p.avgShipping)}</div><div class="kpi-sub">base postage only</div><div class="kpi-delta">${prev?delta(p.avgShipping,prev.avgShipping):''}</div></div>
+  <div class="kpi"><div class="kpi-accent" style="background:${p.totalDelayed>5000?'var(--danger)':'var(--border2)'}"></div><div class="kpi-lbl">Delayed Postage</div><div class="kpi-val ${p.totalDelayed>5000?'c-danger':p.totalDelayed<-100?'c-ca':'c-muted'}">${fmtK(p.totalDelayed)}</div><div class="kpi-sub">Parcll true-ups / credits</div></div>
+</div>
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-accent" style="background:var(--border2)"></div><div class="kpi-lbl">Pick & Pack</div><div class="kpi-val c-muted">${fmtK(p.totalPick)}</div><div class="kpi-sub">${fmt(p.nOrders>0?p.totalPick/p.nOrders:0)}/order</div></div>
+  <div class="kpi"><div class="kpi-accent" style="background:${prev&&p.totalStorage>prev.totalStorage*1.15?'var(--warn)':'var(--border2)'}"></div><div class="kpi-lbl">Storage</div><div class="kpi-val ${prev&&p.totalStorage>prev.totalStorage*1.15?'c-warn':'c-muted'}">${fmtK(p.totalStorage)}</div><div class="kpi-sub">${prev?delta(p.totalStorage,prev.totalStorage):'fixed cost'}</div></div>
+  <div class="kpi"><div class="kpi-accent" style="background:var(--border2)"></div><div class="kpi-lbl">Receiving</div><div class="kpi-val c-muted">${fmtK(p.totalReceiving)}</div><div class="kpi-sub">inbound POs</div></div>
+  <div class="kpi"><div class="kpi-accent" style="background:${p.parcllPct>70?'var(--warn)':ac2}"></div><div class="kpi-lbl">Parcll Mix</div><div class="kpi-val ${p.parcllPct>70?'c-warn':ac}">${p.parcllPct}%</div><div class="kpi-sub">${isCA()?'GoBolt '+p.goboltPct+'%':'of shipments'}</div></div>
+  <div class="kpi"><div class="kpi-accent" style="background:${ac2}"></div><div class="kpi-lbl">YTD Orders</div><div class="kpi-val ${ac}">${ytdOrders.toLocaleString()}</div><div class="kpi-sub">${d.length} periods loaded</div></div>
+</div>
+
+<hr class="div">
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <div class="chart-ttl">Cost per order trend — all periods (${cur()})</div>
+    <div style="position:relative;height:200px"><canvas id="cTrend"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-ttl">Cost mix — ${p.label}</div>
+    <div style="position:relative;height:160px"><canvas id="cDoughnut"></canvas></div>
+    <div id="dLegend" style="margin-top:10px;font-size:9px;color:var(--text3);display:flex;flex-wrap:wrap;gap:7px"></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-ttl">Order volume — all periods</div>
+    <div style="position:relative;height:200px"><canvas id="cVol"></canvas></div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="chart-card">
+    <div class="chart-ttl">Top ${rWord}s — ${p.label}</div>
+    <table class="dt"><thead><tr><th>${rWord}</th><th>Orders</th><th>Share</th><th>Avg ship</th><th>Total ship</th></tr></thead><tbody>
+      ${(p.provinces||[]).map(pv=>{const mx=Math.max(...(p.provinces||[]).map(x=>x.pct));return`<tr><td style="color:var(--text);font-weight:500">${pv.province}</td><td>${pv.orders.toLocaleString()}</td><td>${pv.pct}%<span class="bar-wrap"><span class="bar-fill" style="width:${Math.round(pv.pct/mx*100)}%;background:${ac2}"></span></span></td><td>${fmt(pv.avg)}</td><td>${fmtK(pv.cost)}</td></tr>`;}).join('')}
+    </tbody></table>
+  </div>
+  <div class="chart-card">
+    <div class="chart-ttl">YTD Summary — ${cur()}</div>
+    <table class="dt"><thead><tr><th>Period</th><th>Orders</th><th>Invoice</th><th>$/Order</th><th>Delayed</th></tr></thead><tbody>
+      ${d.map(x=>`<tr style="${x.label===p.label?'background:var(--surface)':''}"><td style="color:${x.label===p.label?ac2:'var(--text2)'}">${x.label}${x.uploaded?' ✦':''}</td><td>${x.nOrders.toLocaleString()}</td><td>${x.invoiceTotal?fmtK(x.invoiceTotal):'—'}</td><td>${x.costPerOrder?fmt(x.costPerOrder):'—'}</td><td class="${x.totalDelayed>5000?'c-danger':x.totalDelayed<-100?'c-ca':''}">${fmtK(x.totalDelayed)}</td></tr>`).join('')}
+      <tr style="border-top:2px solid var(--border2)"><td style="color:var(--text2)">YTD Total</td><td style="color:var(--text);font-weight:600">${ytdOrders.toLocaleString()}</td><td style="color:var(--text);font-weight:600">${ytdInvoice?fmtK(ytdInvoice):'—'}</td><td style="color:var(--text);font-weight:600">${ytdInvoice&&ytdOrders?fmt(ytdInvoice/ytdOrders):'—'}</td><td class="${ytdDelayed>10000?'c-danger':''}">${fmtK(ytdDelayed)}</td></tr>
+    </tbody></table>
+  </div>
+</div>
+
+<hr class="div">
+<div class="slabel">Flags & Alerts — ${p.label}</div>
+<div class="flag-grid">${delayedFlag}${storageFlag}${parcllFlag}</div>
+
+<div style="font-family:var(--fm);font-size:9px;color:var(--text3);margin-top:24px;line-height:2;border-top:1px solid var(--border);padding-top:14px">
+  All amounts ${cur()} pre-tax &nbsp;·&nbsp; CA excludes INV30226 &amp; INV29328 (2025 catch-up invoices) &nbsp;·&nbsp; US excludes INV30237 (2025 Parcll peak surcharges) &nbsp;·&nbsp; ✦ = uploaded this session
+</div>`;
+
+  // ── Charts ──────────────────────────────────────────────────────────────
+  const gridColor = 'rgba(0,0,0,0.06)';
+  const tickColor = '#999999';
+
+  charts.trend = new Chart(document.getElementById('cTrend'),{type:'line',data:{labels:trendLabels,datasets:[{label:'$/order (invoice)',data:trendCPO,borderColor:ac2,backgroundColor:acDim,fill:true,tension:0.35,pointRadius:4,pointBackgroundColor:ac2,borderWidth:2},{label:'Avg ship/order',data:trendShip,borderColor:'#E07B00',backgroundColor:'transparent',fill:false,tension:0.35,pointRadius:3,pointBackgroundColor:'#E07B00',borderWidth:1.5,borderDash:[4,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tickColor,font:{size:9},boxWidth:10}},tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': $'+ctx.raw.toFixed(2)}}},scales:{x:{ticks:{color:tickColor,font:{size:9},maxRotation:38,autoSkip:false},grid:{color:gridColor}},y:{ticks:{color:tickColor,font:{size:9},callback:v=>'$'+v},grid:{color:gridColor}}}}});
+
+  const bkC=[ac2,'#E07B00','#CC1F1F','#AAAAAA','#2B4EA8'];
+  const bkL=['Shipping','Pick & Pack','Delayed Postage','Storage','Receiving'];
+  const bkV=[p.totalShipping,p.totalPick,Math.max(0,p.totalDelayed),p.totalStorage,p.totalReceiving];
+  charts.donut = new Chart(document.getElementById('cDoughnut'),{type:'doughnut',data:{labels:bkL,datasets:[{data:bkV,backgroundColor:bkC,borderWidth:2,borderColor:'#FFFFFF'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+fmtK(ctx.raw)}}}}});
+  const dL=document.getElementById('dLegend');
+  if(dL) dL.innerHTML=bkL.map((l,i)=>`<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:${bkC[i]};display:inline-block"></span>${l}</span>`).join('');
+
+  charts.vol = new Chart(document.getElementById('cVol'),{type:'bar',data:{labels:trendLabels,datasets:[{label:'Fulfilled orders',data:trendOrders,backgroundColor:trendLabels.map(l=>l===p.label?ac2:acDim),borderRadius:2,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.raw.toLocaleString()+' orders'}}},scales:{x:{ticks:{color:tickColor,font:{size:9},maxRotation:38,autoSkip:false},grid:{display:false}},y:{ticks:{color:tickColor,font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v},grid:{color:gridColor}}}}});
+}
+
+render();
 </script>
 </body>
 </html>
