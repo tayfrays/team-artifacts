@@ -120,12 +120,20 @@
 <!-- JESSICA -->
 <div class="person-panel" id="panel-jessica">
   <div class="tool-bar">
-    <button class="tool-tab active" onclick="showTool(this,'jessica','shipping-calculator')">Shipping Calculator</button>
+    <button class="tool-tab active" onclick="showTool(this,'jessica','3pl-cost-report')">3PL Cost Report</button>
+    <button class="tool-tab" onclick="showTool(this,'jessica','shipping-calculator')">Shipping Calculator</button>
     <button class="tool-tab" onclick="showTool(this,'jessica','returns-tracker')">Returns Tracker</button>
     <button class="tool-tab" onclick="showTool(this,'jessica','inventory-health')">Inventory Health</button>
     <button class="tool-tab" onclick="showTool(this,'jessica','3pl-comparison')">3PL Comparison</button>
   </div>
-  <div class="tool-panel active" id="jessica-shipping-calculator">
+  <div class="tool-panel active" id="jessica-3pl-cost-report">
+    <div class="tool-header">
+      <span class="tool-header-name">3PL Cost Report</span>
+      <span class="tool-header-desc">Semi-monthly logistics cost dashboard across Canada (YYZ5) and US (LAX1) — orders, shipping, pick & pack, delayed postage, storage, and carrier mix.</span>
+    </div>
+    <iframe class="tool-frame" src="Jessica/3pl-cost-report.html" title="3PL Cost Report"></iframe>
+  </div>
+  <div class="tool-panel" id="jessica-shipping-calculator">
     <div class="tool-header">
       <span class="tool-header-name">Shipping Calculator</span>
       <span class="tool-header-desc">Blended shipping cost per order across carriers — volume, zone mix, and package weight.</span>
