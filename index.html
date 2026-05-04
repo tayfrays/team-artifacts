@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Outway — Team Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --ow-orange: #FF522C; --ow-black: #000; --ow-white: #fff; }
+  html, body { height: 100%; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--ow-black); display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav { background: var(--ow-black); padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; height: 48px; flex-shrink: 0; border-bottom: 1px solid #1a1a1a; }
+  .nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; color: var(--ow-orange); text-transform: uppercase; }
+  .nav-right { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .1em; color: #444; text-transform: uppercase; }
+
+  /* PERSON TABS */
+  .person-tabs { display: flex; border-bottom: 3px solid var(--ow-orange); background: var(--ow-black); padding: 0 2rem; flex-shrink: 0; }
+  .person-tab { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; padding: .85rem 1.25rem; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -3px; transition: color .15s, border-color .15s; text-align: left; }
+  .person-tab:hover .pt-name { color: #ccc; }
+  .person-tab.active .pt-name { color: var(--ow-white); }
+  .person-tab.active { border-bottom-color: var(--ow-orange); }
+  .pt-name { display: block; font-size: 11px; letter-spacing: .12em; color: #555; transition: color .15s; }
+  .pt-role { display: block; font-size: 9px; letter-spacing: .08em; color: #333; margin-top: 2px; }
+  .person-tab.active .pt-role { color: #888; }
+
+  /* TOOL TABS */
+  .tool-bar { display: flex; align-items: center; gap: 8px; padding: .75rem 2rem; border-bottom: 1px solid #e8e8e8; background: #fafafa; flex-shrink: 0; flex-wrap: wrap; }
+  .tool-tab { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 6px 14px; cursor: pointer; border: 1px solid #e0e0e0; border-radius: 2px; color: #888; background: none; transition: all .15s; }
+  .tool-tab:hover { border-color: var(--ow-black); color: var(--ow-black); }
+  .tool-tab.active { background: var(--ow-black); color: var(--ow-white); border-color: var(--ow-black); }
+
+  /* TOOL HEADER */
+  .tool-header { padding: 1rem 2rem; border-bottom: 1px solid #e8e8e8; flex-shrink: 0; display: flex; align-items: baseline; gap: 1.5rem; }
+  .tool-header-name { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--ow-orange); }
+  .tool-header-desc { font-size: 13px; color: #888; line-height: 1.5; }
+
+  /* IFRAME */
+  .tool-frame { flex: 1; width: 100%; border: none; display: block; min-height: 0; }
+
+  /* PANELS */
+  .person-panel { display: none; flex-direction: column; flex: 1; min-height: 0; }
+  .person-panel.active { display: flex; }
+  .tool-panel { display: none; flex-direction: column; flex: 1; min-height: 0; }
+  .tool-panel.active { display: flex; }
+
+  /* COMING SOON */
+  .coming-soon { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: .75rem; }
+  .coming-soon-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: #ccc; }
+  .coming-soon-name { font-family: Georgia, serif; font-size: 28px; font-weight: 400; color: #ddd; }
+
+  @media (max-width: 680px) {
+    nav, .tool-bar, .tool-header { padding-left: 1rem; padding-right: 1rem; }
+    .person-tab { padding: .7rem .75rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Outway</div>
+  <div class="nav-right" id="nav-date">—</div>
+</nav>
+
+<div class="person-tabs">
+  <button class="person-tab active" onclick="showPerson(this,'taylor')">
+    <span class="pt-name">Taylor</span><span class="pt-role">Marketing</span>
+  </button>
+  <button class="person-tab" onclick="showPerson(this,'jessica')">
+    <span class="pt-name">Jessica</span><span class="pt-role">Ops</span>
+  </button>
+  <button class="person-tab" onclick="showPerson(this,'emily')">
+    <span class="pt-name">Emily</span><span class="pt-role">Content</span>
+  </button>
+  <button class="person-tab" onclick="showPerson(this,'rob')">
+    <span class="pt-name">Rob</span><span class="pt-role">CEO</span>
+  </button>
+</div>
+
+<!-- TAYLOR -->
+<div class="person-panel active" id="panel-taylor">
+  <div class="tool-bar">
+    <button class="tool-tab active" onclick="showTool(this,'taylor','profit-calculator')">Profit Calculator</button>
+    <button class="tool-tab" onclick="showTool(this,'taylor','ad-spend-tracker')">Ad Spend Tracker</button>
+    <button class="tool-tab" onclick="showTool(this,'taylor','mer-dashboard')">MER Dashboard</button>
+    <button class="tool-tab" onclick="showTool(this,'taylor','campaign-budget')">Campaign Budget</button>
+  </div>
+  <div class="tool-panel active" id="taylor-profit-calculator">
+    <div class="tool-header">
+      <span class="tool-header-name">Profit Calculator</span>
+      <span class="tool-header-desc">Interactive P&L waterfall — orders, AOV, COGS, shipping, ad spend, and fixed expenses updating live.</span>
+    </div>
+    <iframe class="tool-frame" src="Taylor/profit-calculator.html" title="Profit Calculator"></iframe>
+  </div>
+  <div class="tool-panel" id="taylor-ad-spend-tracker">
+    <div class="tool-header">
+      <span class="tool-header-name">Ad Spend Tracker</span>
+      <span class="tool-header-desc">Track spend across Meta, Google, and TikTok with blended MER and ROAS breakdowns.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Ad Spend Tracker</div></div>
+  </div>
+  <div class="tool-panel" id="taylor-mer-dashboard">
+    <div class="tool-header">
+      <span class="tool-header-name">MER Dashboard</span>
+      <span class="tool-header-desc">Media efficiency ratio tracker across channels — blended MER, ROAS, and spend vs revenue.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">MER Dashboard</div></div>
+  </div>
+  <div class="tool-panel" id="taylor-campaign-budget">
+    <div class="tool-header">
+      <span class="tool-header-name">Campaign Budget Planner</span>
+      <span class="tool-header-desc">Allocate monthly budget across channels and model how spend shifts affect overall performance.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Campaign Budget Planner</div></div>
+  </div>
+</div>
+
+<!-- JESSICA -->
+<div class="person-panel" id="panel-jessica">
+  <div class="tool-bar">
+    <button class="tool-tab active" onclick="showTool(this,'jessica','shipping-calculator')">Shipping Calculator</button>
+    <button class="tool-tab" onclick="showTool(this,'jessica','returns-tracker')">Returns Tracker</button>
+    <button class="tool-tab" onclick="showTool(this,'jessica','inventory-health')">Inventory Health</button>
+    <button class="tool-tab" onclick="showTool(this,'jessica','3pl-comparison')">3PL Comparison</button>
+  </div>
+  <div class="tool-panel active" id="jessica-shipping-calculator">
+    <div class="tool-header">
+      <span class="tool-header-name">Shipping Calculator</span>
+      <span class="tool-header-desc">Blended shipping cost per order across carriers — volume, zone mix, and package weight.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Shipping Calculator</div></div>
+  </div>
+  <div class="tool-panel" id="jessica-returns-tracker">
+    <div class="tool-header">
+      <span class="tool-header-name">Returns Tracker</span>
+      <span class="tool-header-desc">Return rates by SKU, channel, and month — true cost including restocking and lost margin.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Returns Tracker</div></div>
+  </div>
+  <div class="tool-panel" id="jessica-inventory-health">
+    <div class="tool-header">
+      <span class="tool-header-name">Inventory Health</span>
+      <span class="tool-header-desc">Stock levels across warehouses — days remaining, low-stock flags, and reorder points.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Inventory Health</div></div>
+  </div>
+  <div class="tool-panel" id="jessica-3pl-comparison">
+    <div class="tool-header">
+      <span class="tool-header-name">3PL Cost Comparison</span>
+      <span class="tool-header-desc">Side-by-side fulfillment provider costs — storage, pick and pack, and per-zone shipping.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">3PL Cost Comparison</div></div>
+  </div>
+</div>
+
+<!-- EMILY -->
+<div class="person-panel" id="panel-emily">
+  <div class="tool-bar">
+    <button class="tool-tab active" onclick="showTool(this,'emily','ad-copy-builder')">Ad Copy Builder</button>
+    <button class="tool-tab" onclick="showTool(this,'emily','content-calendar')">Content Calendar</button>
+    <button class="tool-tab" onclick="showTool(this,'emily','ugc-brief')">UGC Brief Generator</button>
+    <button class="tool-tab" onclick="showTool(this,'emily','email-planner')">Email Planner</button>
+  </div>
+  <div class="tool-panel active" id="emily-ad-copy-builder">
+    <div class="tool-header">
+      <span class="tool-header-name">Ad Copy Builder</span>
+      <span class="tool-header-desc">Structure Meta ad copy with character counters, UVP formatting, and a live feed preview.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Ad Copy Builder</div></div>
+  </div>
+  <div class="tool-panel" id="emily-content-calendar">
+    <div class="tool-header">
+      <span class="tool-header-name">Content Calendar</span>
+      <span class="tool-header-desc">Monthly planning view across email, social, and paid — mapped to launches and promotions.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Content Calendar</div></div>
+  </div>
+  <div class="tool-panel" id="emily-ugc-brief">
+    <div class="tool-header">
+      <span class="tool-header-name">UGC Brief Generator</span>
+      <span class="tool-header-desc">Build creator briefs — product, talking points, deliverables, and usage rights in one export.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">UGC Brief Generator</div></div>
+  </div>
+  <div class="tool-panel" id="emily-email-planner">
+    <div class="tool-header">
+      <span class="tool-header-name">Email Campaign Planner</span>
+      <span class="tool-header-desc">Plan sequences with subject lines, timing, segments, and expected revenue contribution.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Email Campaign Planner</div></div>
+  </div>
+</div>
+
+<!-- ROB -->
+<div class="person-panel" id="panel-rob">
+  <div class="tool-bar">
+    <button class="tool-tab active" onclick="showTool(this,'rob','investor-dashboard')">Investor Dashboard</button>
+    <button class="tool-tab" onclick="showTool(this,'rob','growth-model')">Growth Model</button>
+    <button class="tool-tab" onclick="showTool(this,'rob','brand-health')">Brand Health</button>
+    <button class="tool-tab" onclick="showTool(this,'rob','okr-scorecard')">OKR Scorecard</button>
+  </div>
+  <div class="tool-panel active" id="rob-investor-dashboard">
+    <div class="tool-header">
+      <span class="tool-header-name">Investor Dashboard</span>
+      <span class="tool-header-desc">Key metrics for investor reporting — revenue, margin, CAC, LTV, and MER in one view.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Investor Dashboard</div></div>
+  </div>
+  <div class="tool-panel" id="rob-growth-model">
+    <div class="tool-header">
+      <span class="tool-header-name">Growth Model</span>
+      <span class="tool-header-desc">Long-range projections — channel growth, launch cadence, and cost structure over 3 years.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Growth Model</div></div>
+  </div>
+  <div class="tool-panel" id="rob-brand-health">
+    <div class="tool-header">
+      <span class="tool-header-name">Brand Health Tracker</span>
+      <span class="tool-header-desc">NPS, review volume, repeat purchase rate, and social sentiment benchmarked against targets.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">Brand Health Tracker</div></div>
+  </div>
+  <div class="tool-panel" id="rob-okr-scorecard">
+    <div class="tool-header">
+      <span class="tool-header-name">OKR Scorecard</span>
+      <span class="tool-header-desc">Quarterly OKR tracking — objectives, key results, progress, and colour-coded scorecard.</span>
+    </div>
+    <div class="coming-soon"><div class="coming-soon-label">Coming soon</div><div class="coming-soon-name">OKR Scorecard</div></div>
+  </div>
+</div>
+
+<script>
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = new Date();
+  document.getElementById('nav-date').textContent = months[d.getMonth()] + ' ' + d.getFullYear();
+
+  function showPerson(btn, person) {
+    document.querySelectorAll('.person-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.person-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + person).classList.add('active');
+  }
+
+  function showTool(btn, person, tool) {
+    const panel = document.getElementById('panel-' + person);
+    panel.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+    panel.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(person + '-' + tool).classList.add('active');
+  }
+</script>
+</body>
+</html>

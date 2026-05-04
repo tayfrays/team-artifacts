@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Outway — Profit Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ow-orange: #FF522C;
+    --ow-black: #000000;
+    --ow-green: #BDC5BB;
+    --ow-blue: #C0CDDD;
+    --ow-gray: #F1F1F1;
+    --ow-mid-gray: #E5E5E5;
+    --ow-white: #FFFFFF;
+    --ow-positive: #2a7d5a;
+    --ow-negative: #FF522C;
+  }
+
+  body {
+    background: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--ow-black);
+    min-height: 100vh;
+  }
+
+  /* ── BODY ── */
+  .body {
+    padding: 2rem 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── SECTION TAG ── */
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--ow-orange);
+    margin: 2rem 0 .75rem;
+    padding-bottom: .4rem;
+    border-bottom: 1px solid var(--ow-orange);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-tag::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #eee;
+  }
+
+  /* ── GRIDS ── */
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+
+  /* ── INPUTS ── */
+  .input-row { display: flex; flex-direction: column; gap: 5px; }
+  .input-row label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #888;
+  }
+  .input-row input {
+    padding: 9px 12px;
+    font-size: 15px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+    border: 1px solid #ddd;
+    border-bottom: 2px solid #ccc;
+    background: #fafafa;
+    color: var(--ow-black);
+    border-radius: 2px;
+    width: 100%;
+    transition: border-color .15s;
+  }
+  .input-row input:focus {
+    outline: none;
+    border-color: var(--ow-orange);
+    border-bottom-color: var(--ow-orange);
+    background: #fff;
+  }
+  .input-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #bbb;
+  }
+
+  /* ── SLIDER ── */
+  .slider-row { display: flex; flex-direction: column; gap: 5px; }
+  .slider-row .slabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .slider-row .slabel span { color: var(--ow-orange); font-weight: 500; }
+  .slider-row input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    background: var(--ow-mid-gray);
+    border-radius: 0;
+    outline: none;
+    margin: 4px 0;
+  }
+  .slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--ow-orange);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .shint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #bbb;
+  }
+
+  /* ── METRIC CARDS ── */
+  .metric-card {
+    background: var(--ow-gray);
+    padding: 1.1rem 1.1rem 1rem;
+    border-radius: 2px;
+    border-top: 2px solid transparent;
+  }
+  .metric-card.dark {
+    background: var(--ow-black);
+    border-top: 2px solid #222;
+  }
+  .metric-card.outlined {
+    background: #fff;
+    border: 1.5px solid var(--ow-black);
+    border-top: 3px solid var(--ow-orange);
+  }
+
+  .mc-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: .4rem;
+  }
+  .metric-card.dark .mc-tag { color: #444; }
+  .metric-card.outlined .mc-tag { color: var(--ow-orange); }
+
+  .mc-val {
+    font-size: 23px;
+    font-weight: 600;
+    color: var(--ow-black);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1;
+  }
+  .metric-card.dark .mc-val { color: var(--ow-white); }
+  .metric-card.outlined .mc-val { font-size: 28px; }
+
+  .mc-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #bbb;
+    margin-top: .35rem;
+    line-height: 1.5;
+  }
+  .metric-card.dark .mc-sub { color: #444; }
+  .metric-card.outlined .mc-sub { color: #aaa; }
+
+  .mc-cost {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FF522C;
+    margin-top: .3rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .metric-card.dark .mc-cost { color: #ff6b4a; }
+
+  .positive { color: var(--ow-positive) !important; }
+  .negative { color: var(--ow-negative) !important; }
+
+  /* ── WATERFALL ── */
+  .waterfall {
+    border: 1px solid #e8e8e8;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .wf-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .wf-row:last-child { border-bottom: none; }
+  .wf-sub { background: #fcfcfc; }
+  .wf-highlight { background: #fff7f5; }
+  .wf-total {
+    background: var(--ow-black);
+    padding: 12px 16px;
+  }
+  .wf-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .04em;
+    color: #777;
+    text-transform: uppercase;
+  }
+  .wf-highlight .wf-key { color: var(--ow-orange); }
+  .wf-total .wf-key { color: #555; }
+  .wf-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ow-black);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .wf-val.muted { color: #bbb; font-weight: 400; }
+  .wf-total .wf-val { color: var(--ow-white); font-size: 15px; }
+
+  /* ── SCENARIO ── */
+  .scenario-wrap {
+    background: var(--ow-black);
+    border-radius: 2px;
+    padding: 1.5rem;
+    border-top: 3px solid var(--ow-orange);
+  }
+  .scenario-wrap .section-tag {
+    color: var(--ow-orange);
+    border-bottom-color: var(--ow-orange);
+    margin-top: 0;
+  }
+  .scenario-wrap .section-tag::after { background: #1a1a1a; }
+  .scenario-wrap .slabel { color: #555; }
+  .scenario-wrap .shint { color: #333; }
+  .scenario-wrap input[type=range] { background: #1a1a1a; }
+
+  .scen-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 14px;
+    margin-top: .75rem;
+  }
+  .scen-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #444;
+    margin-bottom: .3rem;
+  }
+  .scen-val {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .scen-divider {
+    border: none;
+    border-top: 1px solid #1a1a1a;
+    margin: 14px 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    padding: 1.5rem 2.5rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+  }
+  .footer-left {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    color: #ccc;
+    text-transform: uppercase;
+  }
+  .footer-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .2em;
+    color: var(--ow-orange);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="body">
+
+  <div class="section-tag">Volume Inputs</div>
+  <div class="grid3">
+    <div class="input-row">
+      <label>Orders</label>
+      <input type="number" id="orders" value="4520" min="0" step="1">
+      <span class="input-hint">Total order count</span>
+    </div>
+    <div class="input-row">
+      <label>AOV — incl. shipping</label>
+      <input type="number" id="aov" value="83" min="0" step="0.01">
+      <span class="input-hint">Avg order value including shipping charged</span>
+    </div>
+    <div class="input-row">
+      <label>Avg shipping revenue / order</label>
+      <input type="number" id="shipRevPerOrder" value="2.80" min="0" step="0.01">
+      <span class="input-hint">Portion of AOV that is shipping — breakout only, not added</span>
+    </div>
+  </div>
+
+  <div class="section-tag">Cost Inputs</div>
+  <div class="grid3">
+    <div class="input-row">
+      <label>Avg shipping cost / order</label>
+      <input type="number" id="shipCostPerOrder" value="19.44" min="0" step="0.01">
+      <span class="input-hint">Actual cost to ship</span>
+    </div>
+    <div class="slider-row">
+      <div class="slabel">COGS % of net revenue <span id="cogsLabel">34.0%</span></div>
+      <input type="range" id="cogsPct" min="0" max="80" step="0.1" value="34">
+      <span class="shint">Blended cost of goods sold</span>
+    </div>
+    <div class="input-row">
+      <label>Ad spend ($)</label>
+      <input type="number" id="adSpend" value="181499" min="0" step="100">
+      <span class="input-hint">Total paid media</span>
+    </div>
+  </div>
+  <div class="grid3" style="margin-top:14px">
+    <div class="input-row">
+      <label>Fixed expenses ($)</label>
+      <input type="number" id="fixedExp" value="40000" min="0" step="100">
+      <span class="input-hint">Ops, salaries, overhead</span>
+    </div>
+    <div class="slider-row">
+      <div class="slabel">Transaction fees % of total revenue <span id="txFeeLabel">4.39%</span></div>
+      <input type="range" id="txFeePct" min="0" max="10" step="0.01" value="4.39">
+      <span class="shint">Payment processing & platform fees</span>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="section-tag">Revenue</div>
+  <div class="grid3">
+    <div class="metric-card">
+      <div class="mc-tag">Net Product Revenue</div>
+      <div class="mc-val" id="m-netRev">—</div>
+      <div class="mc-sub">Orders × (AOV − shipping rev)</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-tag">Shipping Revenue</div>
+      <div class="mc-val" id="m-shipRev">—</div>
+      <div class="mc-sub" id="m-shipRevPct">—% of total revenue</div>
+      <div class="mc-sub" id="m-shipRevPerOrder">— avg/order</div>
+    </div>
+    <div class="metric-card outlined">
+      <div class="mc-tag">Total Revenue</div>
+      <div class="mc-val" id="m-totalRev">—</div>
+      <div class="mc-sub">Orders × AOV</div>
+    </div>
+  </div>
+
+  <div class="section-tag">Costs</div>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px">
+    <div class="metric-card dark">
+      <div class="mc-tag">Shipping Cost</div>
+      <div class="mc-val" id="m-shipCostPct">—</div>
+      <div class="mc-cost" id="m-shipCostAmt">—</div>
+      <div class="mc-sub">of total revenue</div>
+    </div>
+    <div class="metric-card dark">
+      <div class="mc-tag">COGS</div>
+      <div class="mc-val" id="m-cogsPctDisp">—</div>
+      <div class="mc-cost" id="m-cogsAmt">—</div>
+      <div class="mc-sub">of net revenue</div>
+    </div>
+    <div class="metric-card dark">
+      <div class="mc-tag">Transaction Fees</div>
+      <div class="mc-val" id="m-txFeePct">—</div>
+      <div class="mc-cost" id="m-txFeeAmt">—</div>
+      <div class="mc-sub">of total revenue</div>
+    </div>
+    <div class="metric-card dark">
+      <div class="mc-tag">Ad Spend</div>
+      <div class="mc-val" id="m-adSpendPct">—</div>
+      <div class="mc-cost" id="m-adSpendAmt">—</div>
+      <div class="mc-sub">of total revenue</div>
+    </div>
+    <div class="metric-card dark">
+      <div class="mc-tag">Fixed Expenses</div>
+      <div class="mc-val" id="m-fixedExpPct">—</div>
+      <div class="mc-cost" id="m-fixedExpAmt">—</div>
+      <div class="mc-sub">of total revenue</div>
+    </div>
+  </div>
+
+  <div class="section-tag">Profitability</div>
+  <div class="grid3">
+    <div class="metric-card">
+      <div class="mc-tag">Contribution Margin %</div>
+      <div class="mc-val" id="m-contPct">—</div>
+      <div class="mc-sub">After COGS, shipping &amp; ads</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-tag">Contribution Profit</div>
+      <div class="mc-val" id="m-contProfit">—</div>
+      <div class="mc-sub">Gross profit − variable costs</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-tag">Net Profit Margin %</div>
+      <div class="mc-val" id="m-netPct">—</div>
+      <div class="mc-sub" id="m-netProfit">—</div>
+    </div>
+  </div>
+
+  <div class="section-tag">Full Waterfall</div>
+  <div class="waterfall">
+    <div class="wf-row wf-highlight"><span class="wf-key">Total revenue (orders × AOV)</span><span class="wf-val" id="f-totalRev">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">&nbsp;&nbsp;&nbsp;of which: shipping revenue</span><span class="wf-val muted" id="f-shipRev">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">&nbsp;&nbsp;&nbsp;of which: product revenue</span><span class="wf-val muted" id="f-netRev">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">− COGS (<span id="f-cogsPctLabel">—</span>% of product rev)</span><span class="wf-val muted" id="f-cogs">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">− Shipping cost</span><span class="wf-val muted" id="f-shipCost">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">− Transaction fees (<span id="f-txFeePctLabel">—</span>% of total rev)</span><span class="wf-val muted" id="f-txFee">—</span></div>
+    <div class="wf-row wf-highlight"><span class="wf-key">= Gross profit</span><span class="wf-val" id="f-grossProfit">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">&nbsp;&nbsp;&nbsp;Gross margin %</span><span class="wf-val muted" id="f-grossMargin">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">− Ad spend</span><span class="wf-val muted" id="f-adSpend">—</span></div>
+    <div class="wf-row wf-highlight"><span class="wf-key">= Contribution profit</span><span class="wf-val" id="f-contProfit">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">&nbsp;&nbsp;&nbsp;Contribution margin %</span><span class="wf-val muted" id="f-contPct2">—</span></div>
+    <div class="wf-row wf-sub"><span class="wf-key">− Fixed expenses</span><span class="wf-val muted" id="f-fixedExp">—</span></div>
+    <div class="wf-row wf-total"><span class="wf-key">Net operating profit</span><span class="wf-val" id="f-netProfit">—</span></div>
+  </div>
+
+  <div class="section-tag" style="margin-top:2rem">Scenario Dial</div>
+  <div class="scenario-wrap">
+    <div class="slider-row">
+      <div class="slabel" style="color:#555">Order volume multiplier <span id="multLabel" style="color:var(--ow-orange)">1.00×</span></div>
+      <input type="range" id="multiplier" min="0.5" max="3" step="0.05" value="1">
+      <span class="shint" style="color:#333">Scale orders up or down — all per-order rates and percentages hold constant</span>
+    </div>
+    <div class="scen-grid">
+      <div><div class="scen-label">Scenario orders</div><div class="scen-val" id="s-orders">—</div></div>
+      <div><div class="scen-label">Scenario total revenue</div><div class="scen-val" id="s-netRev">—</div></div>
+      <div><div class="scen-label">Scenario cont. profit</div><div class="scen-val" id="s-contProfit">—</div></div>
+    </div>
+    <hr class="scen-divider">
+    <div class="scen-grid">
+      <div><div class="scen-label">Scenario MER</div><div class="scen-val" id="s-mer">—</div></div>
+      <div><div class="scen-label">Scenario net profit</div><div class="scen-val" id="s-netProfit">—</div></div>
+      <div><div class="scen-label">Scenario net margin %</div><div class="scen-val" id="s-netPct">—</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const fmt = v => '$' + Math.round(v).toLocaleString();
+  const fmtNeg = v => '−$' + Math.round(Math.abs(v)).toLocaleString();
+  const fmtPct = v => v.toFixed(1) + '%';
+
+  function applyColor(el, v, base) {
+    el.className = base + (v >= 0 ? ' positive' : ' negative');
+  }
+
+  function calc() {
+    const orders       = parseFloat(document.getElementById('orders').value) || 0;
+    const aov          = parseFloat(document.getElementById('aov').value) || 0;
+    const shipRevPO    = parseFloat(document.getElementById('shipRevPerOrder').value) || 0;
+    const shipCostPO   = parseFloat(document.getElementById('shipCostPerOrder').value) || 0;
+    const cogsPct      = parseFloat(document.getElementById('cogsPct').value) || 0;
+    const fixedExp     = parseFloat(document.getElementById('fixedExp').value) || 0;
+    const adSpend      = parseFloat(document.getElementById('adSpend').value) || 0;
+    const txFeePct     = parseFloat(document.getElementById('txFeePct').value) || 0;
+    const mult         = parseFloat(document.getElementById('multiplier').value) || 1;
+
+    const netRev         = orders * aov;                          // total rev = orders × full AOV
+    const totalRev       = netRev;                                 // alias for clarity
+    const shipRev        = orders * shipRevPO;                     // carved out of AOV — breakout only
+    const productRev     = totalRev - shipRev;                     // product-only revenue
+    const shipCost       = orders * shipCostPO;
+    const cogs           = productRev * (cogsPct / 100);           // COGS on product rev only
+    const txFee          = totalRev * (txFeePct / 100);
+    const grossProfit    = totalRev - cogs - shipCost - txFee;
+    const grossMarginPct = totalRev > 0 ? (grossProfit / totalRev) * 100 : 0;
+    const contProfit     = grossProfit - adSpend;
+    const contPct        = totalRev > 0 ? (contProfit / totalRev) * 100 : 0;
+    const netProfit      = contProfit - fixedExp;
+    const netPct         = totalRev > 0 ? (netProfit / totalRev) * 100 : 0;
+    const adPct          = totalRev > 0 ? (adSpend / totalRev) * 100 : 0;
+    const shipRevPct     = totalRev > 0 ? (shipRev / totalRev) * 100 : 0;
+    const shipCostPct    = totalRev > 0 ? (shipCost / totalRev) * 100 : 0;
+    const fixedExpPct    = totalRev > 0 ? (fixedExp / totalRev) * 100 : 0;
+    const shipRevAsPct   = aov > 0 ? (shipRevPO / aov) * 100 : 0;
+
+    document.getElementById('cogsLabel').textContent  = cogsPct.toFixed(1) + '%';
+    document.getElementById('txFeeLabel').textContent = txFeePct.toFixed(2) + '%';
+
+    document.getElementById('m-netRev').textContent    = fmt(productRev);
+    document.getElementById('m-shipRev').textContent   = fmt(shipRev);
+    document.getElementById('m-shipRevPct').textContent = fmtPct(shipRevPct) + ' of total revenue';
+    document.getElementById('m-shipRevPerOrder').textContent = '$' + shipRevPO.toFixed(2) + ' avg/order (' + fmtPct(shipRevAsPct) + ' of AOV)';
+    document.getElementById('m-totalRev').textContent  = fmt(totalRev);
+
+    document.getElementById('m-shipCostPct').textContent = fmtPct(shipCostPct);
+    document.getElementById('m-shipCostAmt').textContent = fmtNeg(shipCost);
+    document.getElementById('m-cogsPctDisp').textContent = fmtPct(cogsPct);
+    document.getElementById('m-cogsAmt').textContent     = fmtNeg(cogs);
+    document.getElementById('m-txFeePct').textContent    = fmtPct(txFeePct);
+    document.getElementById('m-txFeeAmt').textContent    = fmtNeg(txFee);
+    document.getElementById('m-adSpendPct').textContent  = fmtPct(adPct);
+    document.getElementById('m-adSpendAmt').textContent  = fmtNeg(adSpend);
+    document.getElementById('m-fixedExpPct').textContent = fmtPct(fixedExpPct);
+    document.getElementById('m-fixedExpAmt').textContent = fmtNeg(fixedExp);
+
+    applyColor(document.getElementById('m-contPct'),    contPct,    'mc-val');
+    applyColor(document.getElementById('m-contProfit'), contProfit, 'mc-val');
+    document.getElementById('m-contPct').textContent    = fmtPct(contPct);
+    document.getElementById('m-contProfit').textContent = fmt(contProfit);
+
+    applyColor(document.getElementById('m-netPct'), netPct, 'mc-val');
+    document.getElementById('m-netPct').textContent   = fmtPct(netPct);
+    document.getElementById('m-netProfit').textContent = fmt(netProfit) + ' net profit';
+
+    document.getElementById('f-netRev').textContent      = fmt(productRev);
+    document.getElementById('f-shipRev').textContent     = fmt(shipRev);
+    document.getElementById('f-totalRev').textContent    = fmt(totalRev);
+    document.getElementById('f-cogsPctLabel').textContent = cogsPct.toFixed(1);
+    document.getElementById('f-cogs').textContent        = fmt(cogs);
+    document.getElementById('f-shipCost').textContent    = fmt(shipCost);
+    document.getElementById('f-txFeePctLabel').textContent = txFeePct.toFixed(2);
+    document.getElementById('f-txFee').textContent       = fmt(txFee);
+    document.getElementById('f-grossProfit').textContent = fmt(grossProfit);
+    document.getElementById('f-grossMargin').textContent = fmtPct(grossMarginPct);
+    document.getElementById('f-adSpend').textContent     = fmt(adSpend);
+    document.getElementById('f-contPct2').textContent    = fmtPct(contPct);
+    document.getElementById('f-fixedExp').textContent    = fmt(fixedExp);
+
+    applyColor(document.getElementById('f-contProfit'), contProfit, 'wf-val');
+    document.getElementById('f-contProfit').textContent = fmt(contProfit);
+    applyColor(document.getElementById('f-netProfit'), netProfit, 'wf-val');
+    document.getElementById('f-netProfit').textContent = fmt(netProfit);
+
+    document.getElementById('multLabel').textContent = mult.toFixed(2) + '×';
+
+    const sOrders    = Math.round(orders * mult);
+    const sTotalRev  = sOrders * aov;
+    const sShipRev   = sOrders * shipRevPO;
+    const sProductRev = sTotalRev - sShipRev;
+    const sShipCost  = sOrders * shipCostPO;
+    const sCogs      = sProductRev * (cogsPct / 100);
+    const sTxFee     = sTotalRev * (txFeePct / 100);
+    const sGross     = sTotalRev - sCogs - sShipCost - sTxFee;
+    const sCont      = sGross - adSpend;
+    const sNet       = sCont - fixedExp;
+    const sNetPct  = sTotalRev > 0 ? (sNet / sTotalRev) * 100 : 0;
+    const sMer     = adSpend > 0 ? sTotalRev / adSpend : 0;
+
+    document.getElementById('s-orders').textContent = sOrders.toLocaleString();
+    document.getElementById('s-netRev').textContent = fmt(sTotalRev);
+    document.getElementById('s-mer').textContent    = sMer.toFixed(2) + '×';
+
+    applyColor(document.getElementById('s-contProfit'), sCont,    'scen-val');
+    applyColor(document.getElementById('s-netProfit'),  sNet,     'scen-val');
+    applyColor(document.getElementById('s-netPct'),     sNetPct,  'scen-val');
+    document.getElementById('s-contProfit').textContent = fmt(sCont);
+    document.getElementById('s-netProfit').textContent  = fmt(sNet);
+    document.getElementById('s-netPct').textContent     = fmtPct(sNetPct);
+  }
+
+  ['orders','aov','shipRevPerOrder','shipCostPerOrder','fixedExp','adSpend','cogsPct','txFeePct','multiplier'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calc);
+  });
+  calc();
+</script>
+</body>
+</html>
