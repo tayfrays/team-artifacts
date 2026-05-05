@@ -318,6 +318,23 @@
     </div>
   </div>
 
+  <div class="section-tag">Customer Mix</div>
+  <div style="max-width:66%;padding-right:14px">
+    <div class="slider-row">
+      <div class="slabel" style="justify-content:space-between">
+        <span style="color:#888">New customers <span id="newCustLabel" style="color:var(--ow-orange)">60.0%</span></span>
+        <span style="color:#888">Returning customers <span id="retCustLabel" style="color:var(--ow-orange)">40.0%</span></span>
+      </div>
+      <div style="position:relative;margin:6px 0 2px">
+        <input type="range" id="newCustPct" min="0" max="100" step="0.5" value="60" style="width:100%">
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span class="shint">← New</span>
+          <span class="shint">Returning →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="section-tag">Cost Inputs</div>
   <div class="grid3">
     <div class="input-row">
@@ -350,7 +367,35 @@
     <div></div>
   </div>
 
+  <div class="section-tag">Targets</div>
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px">
+    <div class="metric-card outlined">
+      <div class="mc-tag">MER</div>
+      <div class="mc-val" id="t-mer">—</div>
+      <div class="mc-sub">Total revenue ÷ ad spend</div>
+    </div>
+    <div class="metric-card outlined">
+      <div class="mc-tag">AMER</div>
+      <div class="mc-val" id="t-amer">—</div>
+      <div class="mc-sub">New customer revenue ÷ ad spend</div>
+    </div>
+  </div>
+
   <div class="section-tag">Revenue</div>
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px">
+    <div class="metric-card" style="border-top:3px solid #BDC5BB">
+      <div class="mc-tag">New Customer Revenue</div>
+      <div class="mc-val" id="m-newCustRev">—</div>
+      <div class="mc-sub" id="m-newCustPct">—% of total revenue</div>
+      <div class="mc-sub" id="m-newCustOrders">— orders</div>
+    </div>
+    <div class="metric-card" style="border-top:3px solid #C0CDDD">
+      <div class="mc-tag">Returning Customer Revenue</div>
+      <div class="mc-val" id="m-retCustRev">—</div>
+      <div class="mc-sub" id="m-retCustPct">—% of total revenue</div>
+      <div class="mc-sub" id="m-retCustOrders">— orders</div>
+    </div>
+  </div>
   <div class="grid3">
     <div class="metric-card">
       <div class="mc-tag">Net Product Revenue</div>
@@ -481,13 +526,23 @@
     const adSpend      = parseFloat(document.getElementById('adSpend').value) || 0;
     const txFeePct     = parseFloat(document.getElementById('txFeePct').value) || 0;
     const mult         = parseFloat(document.getElementById('multiplier').value) || 1;
+    const newCustPct   = parseFloat(document.getElementById('newCustPct').value) || 0;
+    const retCustPct   = 100 - newCustPct;
 
-    const netRev         = orders * aov;                          // total rev = orders × full AOV
-    const totalRev       = netRev;                                 // alias for clarity
-    const shipRev        = orders * shipRevPO;                     // carved out of AOV — breakout only
-    const productRev     = totalRev - shipRev;                     // product-only revenue
+    // Keep returning label in sync
+    document.getElementById('newCustLabel').textContent = newCustPct.toFixed(1) + '%';
+    document.getElementById('retCustLabel').textContent = retCustPct.toFixed(1) + '%';
+
+    // Update slider gradient — orange left (new), blue right (returning)
+    const slider = document.getElementById('newCustPct');
+    slider.style.background = `linear-gradient(to right, #FF522C ${newCustPct}%, #C0CDDD ${newCustPct}%)`;
+
+    const netRev         = orders * aov;
+    const totalRev       = netRev;
+    const shipRev        = orders * shipRevPO;
+    const productRev     = totalRev - shipRev;
     const shipCost       = orders * shipCostPO;
-    const cogs           = productRev * (cogsPct / 100);           // COGS on product rev only
+    const cogs           = productRev * (cogsPct / 100);
     const txFee          = totalRev * (txFeePct / 100);
     const grossProfit    = totalRev - cogs - shipCost - txFee;
     const grossMarginPct = totalRev > 0 ? (grossProfit / totalRev) * 100 : 0;
@@ -500,9 +555,27 @@
     const shipCostPct    = totalRev > 0 ? (shipCost / totalRev) * 100 : 0;
     const fixedExpPct    = totalRev > 0 ? (fixedExp / totalRev) * 100 : 0;
     const shipRevAsPct   = aov > 0 ? (shipRevPO / aov) * 100 : 0;
+    const currentMer     = adSpend > 0 ? totalRev / adSpend : 0;
+
+    // New / returning customer splits
+    const newCustRev     = totalRev * (newCustPct / 100);
+    const retCustRev     = totalRev * (retCustPct / 100);
+    const newCustOrders  = Math.round(orders * (newCustPct / 100));
+    const retCustOrders  = orders - newCustOrders;
+
+    // AMER = new customer revenue / ad spend
+    const amer           = adSpend > 0 ? newCustRev / adSpend : 0;
 
     document.getElementById('cogsLabel').textContent  = cogsPct.toFixed(1) + '%';
     document.getElementById('txFeeLabel').textContent = txFeePct.toFixed(2) + '%';
+
+    // Customer mix cards
+    document.getElementById('m-newCustRev').textContent    = fmt(newCustRev);
+    document.getElementById('m-newCustPct').textContent    = fmtPct(newCustPct) + ' of total revenue';
+    document.getElementById('m-newCustOrders').textContent = newCustOrders.toLocaleString() + ' orders';
+    document.getElementById('m-retCustRev').textContent    = fmt(retCustRev);
+    document.getElementById('m-retCustPct').textContent    = fmtPct(retCustPct) + ' of total revenue';
+    document.getElementById('m-retCustOrders').textContent = retCustOrders.toLocaleString() + ' orders';
 
     document.getElementById('m-netRev').textContent    = fmt(productRev);
     document.getElementById('m-shipRev').textContent   = fmt(shipRev);
@@ -574,9 +647,13 @@
     document.getElementById('s-contProfit').textContent = fmt(sCont);
     document.getElementById('s-netProfit').textContent  = fmt(sNet);
     document.getElementById('s-netPct').textContent     = fmtPct(sNetPct);
+
+    // Targets
+    document.getElementById('t-mer').textContent  = currentMer.toFixed(2);
+    document.getElementById('t-amer').textContent = amer.toFixed(2);
   }
 
-  ['orders','aov','shipRevPerOrder','shipCostPerOrder','fixedExp','adSpend','cogsPct','txFeePct','multiplier'].forEach(id => {
+  ['orders','aov','shipRevPerOrder','shipCostPerOrder','fixedExp','adSpend','cogsPct','txFeePct','multiplier','newCustPct'].forEach(id => {
     document.getElementById(id).addEventListener('input', calc);
   });
   calc();
