@@ -33,12 +33,14 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--white); color: var(--text); font-family: var(--fm); font-size: 13px; min-height: 100vh; }
+
   /* ── Tool Description ──────────────────────────────────── */
   .tool-desc {
     padding: 1.5rem 2.5rem 0;
-    max-width: 1480px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 0;
   }
   .tool-desc-tag {
     font-family: var(--fm);
@@ -110,7 +112,7 @@
   .tab.us-on { color: var(--us); border-bottom-color: var(--us); }
 
   /* ── Main Layout ───────────────────────────────────────── */
-  .main { padding: 28px 36px 60px; max-width: 1480px; }
+  .main { padding: 28px 36px 60px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
   /* ── Upload bar ────────────────────────────────────────── */
   .upload-bar {
@@ -327,6 +329,7 @@
 <body>
 
 <!-- ── Tool Description ────────────────────────────────────────────────── -->
+
 
 <!-- ── Tab Nav ─────────────────────────────────────────────────────────── -->
 <div class="tabs">
